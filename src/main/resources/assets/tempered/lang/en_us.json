@@ -1,13 +1,4 @@
 {
-  "itemGroup.tempered": "Example Mod Tab",
-  "block.tempered.example_block": "Example Block",
-  "item.tempered.example_item": "Example Item",
-
-  "tempered.configuration.title": "Tempered Configs",
-  "tempered.configuration.section.tempered.common.toml": "Tempered Configs",
-  "tempered.configuration.section.tempered.common.toml.title": "Tempered Configs",
-  "tempered.configuration.items": "Item List",
-  "tempered.configuration.logDirtBlock": "Log Dirt Block",
-  "tempered.configuration.magicNumberIntroduction": "Magic Number Text",
-  "tempered.configuration.magicNumber": "Magic Number"
+  "item.tempered.test_aspect": "Test Aspect",
+  "itemGroup.tempered": "Tempered"
 }
