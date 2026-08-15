@@ -2,6 +2,7 @@ package com.auco.tempered.registry;
 
 import com.auco.tempered.Tempered;
 import com.auco.tempered.aspect.TestAspectItem;
+import com.auco.tempered.component.TestData;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -18,7 +19,7 @@ public final class ModItems {
                     () -> new TestAspectItem(
                             new Item.Properties()
                                     .stacksTo(1)
-                                    .component(ModDataComponents.TEST_LEVEL.value(), 0)
+                                    .component(ModDataComponents.TEST_DATA.value(), new TestData(0, false))
                     )
             );
 

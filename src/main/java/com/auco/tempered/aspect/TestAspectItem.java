@@ -1,9 +1,12 @@
 package com.auco.tempered.aspect;
 
+import com.auco.tempered.component.TestData;
 import com.auco.tempered.registry.ModDataComponents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -27,20 +30,25 @@ public final class TestAspectItem extends Item {
         ItemStack stack = player.getItemInHand(hand);
 
         if (!level.isClientSide) {
-            int currentLevel = stack.getOrDefault(
-                    ModDataComponents.TEST_LEVEL.get(),
-                    0
+            TestData currentTestData = stack.getOrDefault(
+                    ModDataComponents.TEST_DATA.get(),
+                    new TestData(0, false)
             );
 
-            int newLevel = currentLevel + 1;
+            TestData updatedTestData = currentTestData.incrementLevel();
 
             stack.set(
-                    ModDataComponents.TEST_LEVEL.get(),
-                    newLevel
+                    ModDataComponents.TEST_DATA.get(),
+                    updatedTestData
             );
 
             player.displayClientMessage(
-                    Component.literal("Test Level: " + newLevel),
+                    Component.literal("Level: ")
+                            .withStyle(ChatFormatting.GRAY)
+                            .append(
+                                    Component.literal(String.valueOf(updatedTestData.level()))
+                                            .withStyle(ChatFormatting.AQUA)
+                            ),
                     true
             );
         }
@@ -52,19 +60,86 @@ public final class TestAspectItem extends Item {
     }
 
     @Override
+    public boolean isFoil(ItemStack stack) {
+        TestData currentTestData = stack.getOrDefault(
+                ModDataComponents.TEST_DATA.get(),
+                new TestData(0, false)
+        );
+
+        return currentTestData.empowered() || super.isFoil(stack);
+    }
+
+    @Override
+    public boolean onLeftClickEntity(
+            ItemStack stack,
+            Player player,
+            Entity entity
+    ) {
+        if (!player.level().isClientSide) {
+            TestData currentTestData = stack.getOrDefault(
+                    ModDataComponents.TEST_DATA.get(),
+                    new TestData(0, false)
+            );
+
+            TestData updatedTestData = currentTestData.toggleEmpowered();
+
+            stack.set(
+                    ModDataComponents.TEST_DATA.get(),
+                    updatedTestData
+            );
+
+            player.displayClientMessage(
+                    Component.literal("Empowered: ")
+                            .withStyle(ChatFormatting.GRAY)
+                            .append(
+                                    Component.literal(
+                                            updatedTestData.empowered() ? "Yes" : "No"
+                                    ).withStyle(
+                                            updatedTestData.empowered()
+                                                    ? ChatFormatting.GREEN
+                                                    : ChatFormatting.RED
+                                    )
+                            ),
+                    true
+            );
+        }
+
+        return false;
+    }
+
+    @Override
     public void appendHoverText(
             ItemStack stack,
             Item.TooltipContext context,
             List<Component> tooltipComponents,
             TooltipFlag tooltipFlag
     ) {
-        int level = stack.getOrDefault(
-                ModDataComponents.TEST_LEVEL.get(),
-                0
+        TestData currentTestData = stack.getOrDefault(
+                ModDataComponents.TEST_DATA.get(),
+                new TestData(0, false)
         );
 
         tooltipComponents.add(
-                Component.literal("Test Level: " + level)
+                Component.literal("Level: ")
+                        .withStyle(ChatFormatting.GRAY)
+                        .append(
+                                Component.literal(String.valueOf(currentTestData.level()))
+                                        .withStyle(ChatFormatting.AQUA)
+                        )
+        );
+
+        tooltipComponents.add(
+                Component.literal("Empowered: ")
+                        .withStyle(ChatFormatting.GRAY)
+                        .append(
+                                Component.literal(
+                                        currentTestData.empowered() ? "Yes" : "No"
+                                ).withStyle(
+                                        currentTestData.empowered()
+                                                ? ChatFormatting.GREEN
+                                                : ChatFormatting.RED
+                                )
+                        )
         );
 
         super.appendHoverText(

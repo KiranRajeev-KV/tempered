@@ -1,7 +1,7 @@
 package com.auco.tempered.registry;
 
 import com.auco.tempered.Tempered;
-import com.mojang.serialization.Codec;
+import com.auco.tempered.component.TestData;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -18,10 +18,10 @@ public final class ModDataComponents {
                     Tempered.MODID
             );
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> TEST_LEVEL =
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<TestData>> TEST_DATA =
             DATA_COMPONENTS.registerComponentType(
-                    "test_level",
-                    builder -> builder.persistent(Codec.INT)
+                    "test_data",
+                    builder -> builder.persistent(TestData.CODEC)
             );
 
     public static void register(IEventBus eventBus) {
