@@ -1,6 +1,7 @@
 package com.auco.tempered;
 
 import com.auco.tempered.registry.ModCreativeTabs;
+import com.auco.tempered.registry.ModDataComponents;
 import com.auco.tempered.registry.ModItems;
 
 import net.neoforged.bus.api.IEventBus;
@@ -12,6 +13,7 @@ public class Tempered {
     public static final String MODID = "tempered";
 
     public Tempered(IEventBus modEventBus) {
+        ModDataComponents.register(modEventBus);
         ModItems.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
     }
