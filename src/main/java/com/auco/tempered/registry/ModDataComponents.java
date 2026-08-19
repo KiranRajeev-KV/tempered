@@ -1,6 +1,7 @@
 package com.auco.tempered.registry;
 
 import com.auco.tempered.Tempered;
+import com.auco.tempered.attributes.ReinforcedData;
 import com.auco.tempered.component.TestData;
 
 import net.minecraft.core.component.DataComponentType;
@@ -22,6 +23,12 @@ public final class ModDataComponents {
             DATA_COMPONENTS.registerComponentType(
                     "test_data",
                     builder -> builder.persistent(TestData.CODEC)
+            );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ReinforcedData>> REINFORCED_DATA =
+            DATA_COMPONENTS.registerComponentType(
+                    "reinforced_data",
+                    builder -> builder.persistent(ReinforcedData.CODEC)
             );
 
     public static void register(IEventBus eventBus) {

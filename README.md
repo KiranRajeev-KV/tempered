@@ -1,25 +1,51 @@
+Tempered: Affixes & Attributes
 
-Installation information
-=======
+Project Overview
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+Tempered: Affixes & Attributes is a Minecraft equipment progression mod where normal vanilla tools and armor can develop Attributes and Affixes.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+Target: Minecraft 1.21.1 — NeoForge
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+Attributes
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+Attributes are upgrades that the player deliberately chooses.
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+- Applied using special items called Aspects.
+- Aspects can be crafted or discovered as loot.
+- Attributes can have multiple levels.
+- An item can have a maximum of 5 different Attributes.
+- Adding another Attribute increases the chance that the item is permanently destroyed.
+- Upgrading an existing Attribute is safer than adding a new one, but still carries destruction risk.
+- Destruction chance will never reach 100%.
+
+Affixes
+
+Affixes are abilities/properties that equipment develops through use.
+
+- They are earned by performing certain activities with the item or while wearing it.
+- Different activities can result in different Affixes.
+- Affixes can have levels.
+- There is no maximum number of Affixes an item can possess.
+- The exact Affixes and their requirements will be designed later.
+
+Tempering Block
+
+The mod will contain one main block for managing equipment.
+
+It will eventually support:
+
+- Upgrading
+- Rerolling
+- Removing
+- Managing Attributes
+- Managing Affixes
+
+Its exact mechanics and interface will be decided later.
+
+Core Philosophy
+
+Attributes are chosen by the player.
+Affixes are earned through the item's experiences.
+Greater power always comes with greater risk.
+
+The exact Attributes, Affixes, Aspects, probabilities, recipes, and balancing will be finalized later.

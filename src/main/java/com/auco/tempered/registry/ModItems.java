@@ -19,7 +19,7 @@ public final class ModItems {
                     () -> new TestAspectItem(
                             new Item.Properties()
                                     .stacksTo(1)
-                                    .component(ModDataComponents.TEST_DATA.value(), new TestData(0, false))
+                                    .component(ModDataComponents.TEST_DATA.value(), TestData.DEFAULT)
                     )
             );
 

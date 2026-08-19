@@ -32,7 +32,7 @@ public final class TestAspectItem extends Item {
         if (!level.isClientSide) {
             TestData currentTestData = stack.getOrDefault(
                     ModDataComponents.TEST_DATA.get(),
-                    new TestData(0, false)
+                    TestData.DEFAULT
             );
 
             TestData updatedTestData = currentTestData.incrementLevel();
@@ -63,7 +63,7 @@ public final class TestAspectItem extends Item {
     public boolean isFoil(ItemStack stack) {
         TestData currentTestData = stack.getOrDefault(
                 ModDataComponents.TEST_DATA.get(),
-                new TestData(0, false)
+                TestData.DEFAULT
         );
 
         return currentTestData.empowered() || super.isFoil(stack);
@@ -78,7 +78,7 @@ public final class TestAspectItem extends Item {
         if (!player.level().isClientSide) {
             TestData currentTestData = stack.getOrDefault(
                     ModDataComponents.TEST_DATA.get(),
-                    new TestData(0, false)
+                    TestData.DEFAULT
             );
 
             TestData updatedTestData = currentTestData.toggleEmpowered();
@@ -116,7 +116,7 @@ public final class TestAspectItem extends Item {
     ) {
         TestData currentTestData = stack.getOrDefault(
                 ModDataComponents.TEST_DATA.get(),
-                new TestData(0, false)
+                TestData.DEFAULT
         );
 
         tooltipComponents.add(
