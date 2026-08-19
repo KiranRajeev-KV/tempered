@@ -1,8 +1,12 @@
 package com.auco.tempered.aspect;
 
+import com.auco.tempered.attributes.ReinforcedData;
 import com.auco.tempered.component.TestData;
 import com.auco.tempered.registry.ModDataComponents;
+import com.auco.tempered.tag.ModItemTags;
+
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -27,46 +31,107 @@ public final class TestAspectItem extends Item {
             Player player,
             InteractionHand hand
     ) {
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack aspectStack = player.getItemInHand(hand);
 
         if (!level.isClientSide) {
-            TestData currentTestData = stack.getOrDefault(
-                    ModDataComponents.TEST_DATA.get(),
-                    TestData.DEFAULT
+
+            // For this prototype:
+            // Main hand -> Test Aspect
+            // Offhand   -> Item receiving Reinforced
+            ItemStack targetStack =
+                    player.getItemInHand(InteractionHand.OFF_HAND);
+
+            // The target must belong to:
+            // #tempered:reinforceable
+            if (!targetStack.is(ModItemTags.REINFORCEABLE)) {
+                player.displayClientMessage(
+                        Component.literal(
+                                "This item cannot be Reinforced"
+                        ).withStyle(ChatFormatting.RED),
+                        true
+                );
+
+                return InteractionResultHolder.sidedSuccess(
+                        aspectStack,
+                        level.isClientSide
+                );
+            }
+
+            // No REINFORCED_DATA component means Reinforced 0.
+            if (targetStack.has(
+                    ModDataComponents.REINFORCED_DATA.get()
+            )) {
+                player.displayClientMessage(
+                        Component.literal(
+                                "This item is already Reinforced"
+                        ).withStyle(ChatFormatting.RED),
+                        true
+                );
+
+                return InteractionResultHolder.sidedSuccess(
+                        aspectStack,
+                        level.isClientSide
+                );
+            }
+
+            // Reinforced 0:
+            // The item's original max durability.
+            int baseMaxDamage = targetStack.getMaxDamage();
+
+            // Reinforced I:
+            // +10% maximum durability.
+            int reinforcedMaxDamage =
+                    Math.round(baseMaxDamage * 1.10f);
+
+            ReinforcedData reinforcedData =
+                    new ReinforcedData(
+                            1,
+                            baseMaxDamage
+                    );
+
+            // Store Tempered's state.
+            targetStack.set(
+                    ModDataComponents.REINFORCED_DATA.get(),
+                    reinforcedData
             );
 
-            TestData updatedTestData = currentTestData.incrementLevel();
-
-            stack.set(
-                    ModDataComponents.TEST_DATA.get(),
-                    updatedTestData
+            // Modify Minecraft's actual maximum durability
+            // for this particular ItemStack.
+            targetStack.set(
+                    DataComponents.MAX_DAMAGE,
+                    reinforcedMaxDamage
             );
 
             player.displayClientMessage(
-                    Component.literal("Level: ")
-                            .withStyle(ChatFormatting.GRAY)
+                    Component.literal("Reinforced I: ")
+                            .withStyle(ChatFormatting.GREEN)
                             .append(
-                                    Component.literal(String.valueOf(updatedTestData.level()))
-                                            .withStyle(ChatFormatting.AQUA)
+                                    Component.literal(
+                                            baseMaxDamage
+                                                    + " -> "
+                                                    + reinforcedMaxDamage
+                                    ).withStyle(ChatFormatting.AQUA)
                             ),
                     true
             );
         }
 
         return InteractionResultHolder.sidedSuccess(
-                stack,
+                aspectStack,
                 level.isClientSide
         );
     }
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        TestData currentTestData = stack.getOrDefault(
-                ModDataComponents.TEST_DATA.get(),
-                TestData.DEFAULT
-        );
+        TestData currentTestData =
+                stack.getOrDefault(
+                        ModDataComponents.TEST_DATA.get(),
+                        TestData.DEFAULT
+                );
 
-        return currentTestData.empowered() || super.isFoil(stack);
+        return currentTestData.empowered()
+                || super.isFoil(stack);
     }
 
     @Override
@@ -76,12 +141,14 @@ public final class TestAspectItem extends Item {
             Entity entity
     ) {
         if (!player.level().isClientSide) {
-            TestData currentTestData = stack.getOrDefault(
-                    ModDataComponents.TEST_DATA.get(),
-                    TestData.DEFAULT
-            );
+            TestData currentTestData =
+                    stack.getOrDefault(
+                            ModDataComponents.TEST_DATA.get(),
+                            TestData.DEFAULT
+                    );
 
-            TestData updatedTestData = currentTestData.toggleEmpowered();
+            TestData updatedTestData =
+                    currentTestData.toggleEmpowered();
 
             stack.set(
                     ModDataComponents.TEST_DATA.get(),
@@ -93,7 +160,9 @@ public final class TestAspectItem extends Item {
                             .withStyle(ChatFormatting.GRAY)
                             .append(
                                     Component.literal(
-                                            updatedTestData.empowered() ? "Yes" : "No"
+                                            updatedTestData.empowered()
+                                                    ? "Yes"
+                                                    : "No"
                                     ).withStyle(
                                             updatedTestData.empowered()
                                                     ? ChatFormatting.GREEN
@@ -114,17 +183,23 @@ public final class TestAspectItem extends Item {
             List<Component> tooltipComponents,
             TooltipFlag tooltipFlag
     ) {
-        TestData currentTestData = stack.getOrDefault(
-                ModDataComponents.TEST_DATA.get(),
-                TestData.DEFAULT
-        );
+        TestData currentTestData =
+                stack.getOrDefault(
+                        ModDataComponents.TEST_DATA.get(),
+                        TestData.DEFAULT
+                );
 
         tooltipComponents.add(
                 Component.literal("Level: ")
                         .withStyle(ChatFormatting.GRAY)
                         .append(
-                                Component.literal(String.valueOf(currentTestData.level()))
-                                        .withStyle(ChatFormatting.AQUA)
+                                Component.literal(
+                                        String.valueOf(
+                                                currentTestData.level()
+                                        )
+                                ).withStyle(
+                                        ChatFormatting.AQUA
+                                )
                         )
         );
 
@@ -133,7 +208,9 @@ public final class TestAspectItem extends Item {
                         .withStyle(ChatFormatting.GRAY)
                         .append(
                                 Component.literal(
-                                        currentTestData.empowered() ? "Yes" : "No"
+                                        currentTestData.empowered()
+                                                ? "Yes"
+                                                : "No"
                                 ).withStyle(
                                         currentTestData.empowered()
                                                 ? ChatFormatting.GREEN
