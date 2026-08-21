@@ -1,7 +1,7 @@
 {
   "item.tempered.reinforced_aspect": "Reinforced Aspect",
   "itemGroup.tempered": "Tempered",
-  "tooltip.tempered.reinforced.level": "Reinforced %s",
+  "tooltip.tempered.reinforced.title": "Reinforced %s",
   "tooltip.tempered.reinforced.durability": "+%s%% Maximum Durability",
   "message.tempered.reinforced.success": "Reinforced %s: %s → %s durability",
   "message.tempered.reinforced.not_damageable": "Hold a damageable item in your main hand.",
