@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "tempered:item/test_aspect"
+    "layer0": "tempered:item/reinforced_aspect"
   }
 }
