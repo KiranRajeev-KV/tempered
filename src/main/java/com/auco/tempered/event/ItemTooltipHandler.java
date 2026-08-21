@@ -1,7 +1,7 @@
 package com.auco.tempered.event;
 
 import com.auco.tempered.Tempered;
-import com.auco.tempered.attributes.ReinforcedData;
+import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
 import com.auco.tempered.registry.ModDataComponents;
 
 import net.minecraft.ChatFormatting;
@@ -36,17 +36,22 @@ public final class ItemTooltipHandler {
             return;
         }
 
-        int level = reinforcedData.level();
-        int durabilityBonusPercent = level * 10;
+        if (!reinforcedData.isValid()) {
+            return;
+        }
 
         event.getToolTip().add(
-                Component.literal("Reinforced " + getRomanLevel(level))
+                Component.translatable(
+                        "tooltip.tempered.reinforced.level",
+                        getRomanLevel(reinforcedData.level())
+                )
                         .withStyle(ChatFormatting.AQUA)
         );
 
         event.getToolTip().add(
-                Component.literal(
-                        "+" + durabilityBonusPercent + "% Durability"
+                Component.translatable(
+                        "tooltip.tempered.reinforced.durability",
+                        reinforcedData.durabilityBonusPercent()
                 ).withStyle(ChatFormatting.GRAY)
         );
     }

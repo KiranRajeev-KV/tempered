@@ -1,8 +1,7 @@
 package com.auco.tempered.registry;
 
 import com.auco.tempered.Tempered;
-import com.auco.tempered.aspect.TestAspectItem;
-import com.auco.tempered.component.TestData;
+import com.auco.tempered.item.aspect.ReinforcedAspectItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -13,13 +12,12 @@ public final class ModItems {
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(Tempered.MODID);
 
-    public static final DeferredItem<TestAspectItem> TEST_ASPECT =
+    public static final DeferredItem<ReinforcedAspectItem> REINFORCED_ASPECT =
             ITEMS.register(
-                    "test_aspect",
-                    () -> new TestAspectItem(
+                    "reinforced_aspect",
+                    () -> new ReinforcedAspectItem(
                             new Item.Properties()
-                                    .stacksTo(1)
-                                    .component(ModDataComponents.TEST_DATA.value(), TestData.DEFAULT)
+                                    .stacksTo(16)
                     )
             );
 

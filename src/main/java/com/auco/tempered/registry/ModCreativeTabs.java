@@ -12,7 +12,6 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModCreativeTabs {
-    //
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(
                     Registries.CREATIVE_MODE_TAB,
@@ -25,9 +24,9 @@ public final class ModCreativeTabs {
                     () -> CreativeModeTab.builder()
                             .title(Component.translatable("itemGroup.tempered"))
                             .withTabsBefore(CreativeModeTabs.BUILDING_BLOCKS)
-                            .icon(() -> ModItems.TEST_ASPECT.get().getDefaultInstance())
+                            .icon(() -> ModItems.REINFORCED_ASPECT.get().getDefaultInstance())
                             .displayItems((parameters, output) -> {
-                                output.accept(ModItems.TEST_ASPECT.get());
+                                output.accept(ModItems.REINFORCED_ASPECT.get());
                             })
                             .build()
             );
