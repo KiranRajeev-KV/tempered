@@ -15,6 +15,10 @@ import net.minecraft.world.level.Level;
 
 /**
  * Consumable aspect that upgrades the damageable item held in the main hand.
+ *
+ * <p>Minecraft calls {@link #use(Level, Player, InteractionHand)} once for
+ * each hand during a right-click interaction. This item acts only from the
+ * offhand, leaving the main hand available for the target equipment.</p>
  */
 public final class ReinforcedAspectItem extends Item {
 
@@ -30,13 +34,16 @@ public final class ReinforcedAspectItem extends Item {
     ) {
         ItemStack aspectStack = player.getItemInHand(hand);
 
-        // The aspect is intentionally an offhand catalyst. Returning PASS from
-        // the main hand lets Minecraft continue to the offhand interaction.
+        // PASS tells Minecraft this hand did not handle the interaction. It is
+        // important here: returning success in the main hand would stop the
+        // interaction pipeline before the offhand could be considered.
         if (hand != InteractionHand.OFF_HAND) {
             return InteractionResultHolder.pass(aspectStack);
         }
 
         ItemStack targetStack = player.getMainHandItem();
+        // Inspect performs no mutation, so it is safe on client and server.
+        // The client needs this result to choose the same interaction outcome.
         ReinforcementResult preview = ReinforcementService.inspect(targetStack);
         if (!preview.isSuccess()) {
             if (!level.isClientSide) {
@@ -46,6 +53,8 @@ public final class ReinforcedAspectItem extends Item {
         }
 
         if (!level.isClientSide) {
+            // The server owns inventory and component mutations. Doing this on
+            // both sides would cause duplicate consumption or desyncs.
             ReinforcementResult applied = ReinforcementService.apply(targetStack);
             if (!applied.isSuccess()) {
                 player.displayClientMessage(failureMessage(applied), true);
@@ -53,6 +62,7 @@ public final class ReinforcedAspectItem extends Item {
             }
 
             if (!player.getAbilities().instabuild) {
+                // Creative mode normally does not consume ordinary items.
                 aspectStack.shrink(1);
             }
 

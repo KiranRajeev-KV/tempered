@@ -7,6 +7,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+/** Holds all item registry entries owned by Tempered. */
 public final class ModItems {
 
     public static final DeferredRegister.Items ITEMS =
@@ -17,6 +18,8 @@ public final class ModItems {
                     "reinforced_aspect",
                     () -> new ReinforcedAspectItem(
                             new Item.Properties()
+                                    // Aspects are consumables, but keeping a
+                                    // small stack size makes inventory use less tedious.
                                     .stacksTo(16)
                     )
             );

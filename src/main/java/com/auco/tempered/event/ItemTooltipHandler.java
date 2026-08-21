@@ -13,6 +13,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
+/**
+ * Adds client-only information to the vanilla tooltip for reinforced stacks.
+ *
+ * <p>The component is synchronized with the ItemStack, so the client can read
+ * it directly without sending a custom network packet.</p>
+ */
 @EventBusSubscriber(
         modid = Tempered.MODID,
         value = Dist.CLIENT
@@ -23,7 +29,8 @@ public final class ItemTooltipHandler {
     public static void onItemTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
 
-        // Normal items have no Reinforced component.
+        // Most stacks never receive this component, so exit before doing any
+        // tooltip allocation work.
         if (!stack.has(ModDataComponents.REINFORCED_DATA.get())) {
             return;
         }
@@ -37,6 +44,7 @@ public final class ItemTooltipHandler {
         }
 
         if (!reinforcedData.isValid()) {
+            // Do not display misleading progress for edited/corrupt data.
             return;
         }
 

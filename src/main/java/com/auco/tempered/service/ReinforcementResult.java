@@ -1,6 +1,12 @@
 package com.auco.tempered.service;
 
-/** Result of inspecting or applying a Reinforced upgrade. */
+/**
+ * Immutable description of a reinforcement attempt.
+ *
+ * <p>Returning a result instead of showing messages inside the service keeps
+ * the rules reusable. The item decides how each result is presented to a
+ * player.</p>
+ */
 public record ReinforcementResult(
         Status status,
         int previousLevel,
@@ -8,6 +14,7 @@ public record ReinforcementResult(
         int previousMaxDamage,
         int newMaxDamage
 ) {
+    /** The possible outcomes before an item stack is changed. */
     public enum Status {
         SUCCESS,
         NOT_DAMAGEABLE,

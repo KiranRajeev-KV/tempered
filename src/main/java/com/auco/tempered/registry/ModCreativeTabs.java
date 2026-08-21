@@ -11,6 +11,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+/** Registers Tempered's Creative inventory tab. */
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(
@@ -26,6 +27,8 @@ public final class ModCreativeTabs {
                             .withTabsBefore(CreativeModeTabs.BUILDING_BLOCKS)
                             .icon(() -> ModItems.REINFORCED_ASPECT.get().getDefaultInstance())
                             .displayItems((parameters, output) -> {
+                                // A registered item does not automatically
+                                // appear in Creative mode; add it explicitly.
                                 output.accept(ModItems.REINFORCED_ASPECT.get());
                             })
                             .build()

@@ -10,6 +10,12 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+/**
+ * Registers custom values that can be stored directly on an {@code ItemStack}.
+ *
+ * <p>Data components replace ad-hoc NBT for new Minecraft versions. The
+ * component type is the typed key; {@code ReinforcedData} is its value.</p>
+ */
 public final class ModDataComponents {
 
     public static final DeferredRegister.DataComponents DATA_COMPONENTS =
@@ -21,6 +27,8 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ReinforcedData>> REINFORCED_DATA =
             DATA_COMPONENTS.registerComponentType(
                     "reinforced_data",
+                    // persistent makes the Codec responsible for saving the
+                    // value and also provides the default network codec.
                     builder -> builder.persistent(ReinforcedData.CODEC)
             );
 
