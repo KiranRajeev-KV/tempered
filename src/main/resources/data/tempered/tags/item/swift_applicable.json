@@ -1,5 +1,8 @@
 {
   "values": [
-    "#c:tools"
+    "#minecraft:pickaxes",
+    "#minecraft:axes",
+    "#minecraft:shovels",
+    "#minecraft:hoes"
   ]
 }

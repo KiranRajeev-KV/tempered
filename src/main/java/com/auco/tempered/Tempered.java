@@ -3,6 +3,7 @@ package com.auco.tempered;
 import com.auco.tempered.registry.ModCreativeTabs;
 import com.auco.tempered.registry.ModDataComponents;
 import com.auco.tempered.registry.ModItems;
+import com.auco.tempered.registry.ModRecipeSerializers;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -21,6 +22,7 @@ public class Tempered {
         // them here lets NeoForge register those entries at the correct time.
         ModDataComponents.register(modEventBus);
         ModItems.register(modEventBus);
+        ModRecipeSerializers.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
     }
 }
