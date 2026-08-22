@@ -1,10 +1,17 @@
 {
   "item.tempered.reinforced_aspect": "Reinforced Aspect",
+  "item.tempered.swift_aspect": "Swift Aspect",
   "itemGroup.tempered": "Tempered",
   "tooltip.tempered.reinforced.title": "Reinforced %s",
   "tooltip.tempered.reinforced.durability": "+%s%% Maximum Durability",
+  "tooltip.tempered.swift.title": "Swift %s",
+  "tooltip.tempered.swift.mining_speed": "+%s%% Mining Speed",
   "message.tempered.reinforced.success": "Reinforced %s: %s → %s durability",
   "message.tempered.reinforced.not_damageable": "Hold a damageable item in your main hand.",
   "message.tempered.reinforced.max_level": "This item is already Reinforced V.",
-  "message.tempered.reinforced.invalid_data": "This item's Reinforced data is invalid."
+  "message.tempered.reinforced.invalid_data": "This item's Reinforced data is invalid.",
+  "message.tempered.swift.success": "Swift %s applied: +%s%% mining speed",
+  "message.tempered.swift.not_applicable": "Hold a Swift-compatible tool in your main hand.",
+  "message.tempered.swift.max_level": "This item is already Swift V.",
+  "message.tempered.swift.invalid_data": "This item's Swift data is invalid."
 }

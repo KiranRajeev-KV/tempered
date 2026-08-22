@@ -2,7 +2,9 @@ package com.auco.tempered.event;
 
 import com.auco.tempered.Tempered;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
+import com.auco.tempered.equipment.attribute.swift.SwiftData;
 import com.auco.tempered.registry.ModDataComponents;
+import com.auco.tempered.service.SwiftService;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -14,7 +16,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 /**
- * Adds client-only information to the vanilla tooltip for reinforced stacks.
+ * Adds client-only Aspect information to vanilla item tooltips.
  *
  * <p>The component is synchronized with the ItemStack, so the client can read
  * it directly without sending a custom network packet.</p>
@@ -37,30 +39,26 @@ public final class ItemTooltipHandler {
     public static void onItemTooltip(ItemTooltipEvent event) {
         ItemStack stack = event.getItemStack();
 
-        // Most stacks never receive this component, so exit before doing any
-        // tooltip allocation work.
-        if (!stack.has(ModDataComponents.REINFORCED_DATA.get())) {
-            return;
+        int insertIndex = REINFORCEMENT_TOOLTIP_INDEX;
+
+        ReinforcedData reinforcedData = stack.get(ModDataComponents.REINFORCED_DATA.get());
+        if (reinforcedData != null && reinforcedData.isValid()) {
+            insertIndex = addReinforcedTooltip(event, reinforcedData, insertIndex);
         }
 
-        ReinforcedData reinforcedData = stack.get(
-                ModDataComponents.REINFORCED_DATA.get()
-        );
-
-        if (reinforcedData == null) {
-            return;
+        SwiftData swiftData = SwiftService.getActiveData(stack);
+        if (swiftData != null) {
+            addSwiftTooltip(event, swiftData, insertIndex);
         }
+    }
 
-        if (!reinforcedData.isValid()) {
-            // Do not display misleading progress for edited/corrupt data.
-            return;
-        }
-
-        // ItemTooltipEvent is fired after vanilla has assembled the tooltip.
-        // Insert our compact two-line section beneath the item name instead of
-        // appending it after vanilla's unrelated details.
+    private static int addReinforcedTooltip(
+            ItemTooltipEvent event,
+            ReinforcedData reinforcedData,
+            int insertIndex
+    ) {
         event.getToolTip().add(
-                Math.min(REINFORCEMENT_TOOLTIP_INDEX, event.getToolTip().size()),
+                safeInsertionIndex(event, insertIndex),
                 Component.translatable(
                         "tooltip.tempered.reinforced.title",
                         toRomanNumeral(reinforcedData.level())
@@ -69,12 +67,40 @@ public final class ItemTooltipHandler {
         );
 
         event.getToolTip().add(
-                Math.min(REINFORCEMENT_TOOLTIP_INDEX + 1, event.getToolTip().size()),
+                safeInsertionIndex(event, insertIndex + 1),
                 Component.translatable(
                         "tooltip.tempered.reinforced.durability",
                         reinforcedData.durabilityBonusPercent()
                 ).withStyle(ChatFormatting.BLUE)
         );
+
+        return insertIndex + 2;
+    }
+
+    private static void addSwiftTooltip(
+            ItemTooltipEvent event,
+            SwiftData swiftData,
+            int insertIndex
+    ) {
+        event.getToolTip().add(
+                safeInsertionIndex(event, insertIndex),
+                Component.translatable(
+                        "tooltip.tempered.swift.title",
+                        toRomanNumeral(swiftData.level())
+                ).withStyle(ChatFormatting.GOLD)
+        );
+
+        event.getToolTip().add(
+                safeInsertionIndex(event, insertIndex + 1),
+                Component.translatable(
+                        "tooltip.tempered.swift.mining_speed",
+                        swiftData.miningSpeedBonusPercent()
+                ).withStyle(ChatFormatting.BLUE)
+        );
+    }
+
+    private static int safeInsertionIndex(ItemTooltipEvent event, int requestedIndex) {
+        return Math.min(requestedIndex, event.getToolTip().size());
     }
 
     /**
