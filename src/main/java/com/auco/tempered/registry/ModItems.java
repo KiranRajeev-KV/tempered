@@ -2,6 +2,7 @@ package com.auco.tempered.registry;
 
 import com.auco.tempered.Tempered;
 import com.auco.tempered.item.aspect.ReinforcedAspectItem;
+import com.auco.tempered.item.aspect.SwiftAspectItem;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -21,6 +22,14 @@ public final class ModItems {
                                     // Aspects are consumables, but keeping a
                                     // small stack size makes inventory use less tedious.
                                     .stacksTo(16)
+                    )
+            );
+
+    public static final DeferredItem<SwiftAspectItem> SWIFT_ASPECT =
+            ITEMS.register(
+                    "swift_aspect",
+                    () -> new SwiftAspectItem(
+                            new Item.Properties().stacksTo(16)
                     )
             );
 

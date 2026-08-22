@@ -30,6 +30,7 @@ public final class ModCreativeTabs {
                                 // A registered item does not automatically
                                 // appear in Creative mode; add it explicitly.
                                 output.accept(ModItems.REINFORCED_ASPECT.get());
+                                output.accept(ModItems.SWIFT_ASPECT.get());
                             })
                             .build()
             );

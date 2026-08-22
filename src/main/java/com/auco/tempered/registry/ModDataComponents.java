@@ -2,6 +2,7 @@ package com.auco.tempered.registry;
 
 import com.auco.tempered.Tempered;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
+import com.auco.tempered.equipment.attribute.swift.SwiftData;
 
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -30,6 +31,12 @@ public final class ModDataComponents {
                     // persistent makes the Codec responsible for saving the
                     // value and also provides the default network codec.
                     builder -> builder.persistent(ReinforcedData.CODEC)
+            );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SwiftData>> SWIFT_DATA =
+            DATA_COMPONENTS.registerComponentType(
+                    "swift_data",
+                    builder -> builder.persistent(SwiftData.CODEC)
             );
 
     public static void register(IEventBus eventBus) {
