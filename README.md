@@ -1,51 +1,93 @@
-Tempered: Affixes & Attributes
+# Tempered
 
-Project Overview
+Tempered is a Minecraft equipment-progression mod for **Minecraft 1.21.1**
+with **NeoForge**. It adds player-chosen **Attributes** through consumable
+**Aspects**. The current implementation focuses on a small, understandable
+foundation that can grow into a larger tempering system later.
 
-Tempered: Affixes & Attributes is a Minecraft equipment progression mod where normal vanilla tools and armor can develop Attributes and Affixes.
+## Current features
 
-Target: Minecraft 1.21.1 — NeoForge
+### Applying Aspects
 
-Attributes
+Apply an Aspect at a smithing table:
 
-Attributes are upgrades that the player deliberately chooses.
+1. Put the target item in the **base** slot (the middle slot).
+2. Put an Aspect in the **addition** slot (the right slot).
+3. Leave the template slot empty.
+4. Take the result to apply the next level and consume one Aspect.
 
-- Applied using special items called Aspects.
-- Aspects can be crafted or discovered as loot.
-- Attributes can have multiple levels.
-- An item can have a maximum of 5 different Attributes.
-- Adding another Attribute increases the chance that the item is permanently destroyed.
-- Upgrading an existing Attribute is safer than adding a new one, but still carries destruction risk.
-- Destruction chance will never reach 100%.
+The result keeps the original item's enchantments, custom name, damage, and
+other stack data. An Aspect cannot be applied past level V.
 
-Affixes
+### Reinforced Aspect
 
-Affixes are abilities/properties that equipment develops through use.
+Reinforced can be applied to any damageable item, including tools, weapons,
+armor, shields, and compatible modded equipment.
 
-- They are earned by performing certain activities with the item or while wearing it.
-- Different activities can result in different Affixes.
-- Affixes can have levels.
-- There is no maximum number of Affixes an item can possess.
-- The exact Affixes and their requirements will be designed later.
+| Level | Maximum durability bonus |
+| --- | ---: |
+| I | +10% |
+| II | +20% |
+| III | +30% |
+| IV | +40% |
+| V | +50% |
 
-Tempering Block
+The first application records the item's original maximum durability. Every
+later level is calculated from that same baseline, so the bonus never compounds
+unexpectedly.
 
-The mod will contain one main block for managing equipment.
+### Swift Aspect
 
-It will eventually support:
+Swift can be applied to pickaxes, axes, shovels, and hoes. It multiplies the
+player's final mining speed, so it composes with effects such as Efficiency and
+Haste.
 
-- Upgrading
-- Rerolling
-- Removing
-- Managing Attributes
-- Managing Affixes
+| Level | Mining speed bonus |
+| --- | ---: |
+| I | +8% |
+| II | +16% |
+| III | +24% |
+| IV | +32% |
+| V | +40% |
 
-Its exact mechanics and interface will be decided later.
+Swift eligibility is controlled by the datapack tag
+[`tempered:swift_applicable`](src/main/resources/data/tempered/tags/item/swift_applicable.json).
+By default it includes the vanilla `minecraft:pickaxes`, `minecraft:axes`,
+`minecraft:shovels`, and `minecraft:hoes` tags. Modpacks and datapacks can
+extend this tag without changing Java code.
 
-Core Philosophy
+## Development
 
-Attributes are chosen by the player.
-Affixes are earned through the item's experiences.
-Greater power always comes with greater risk.
+Requirements:
 
-The exact Attributes, Affixes, Aspects, probabilities, recipes, and balancing will be finalized later.
+- Java 21
+- Minecraft 1.21.1
+- NeoForge 21.1.248
+
+Useful Gradle commands:
+
+```sh
+./gradlew runClient
+./gradlew runServer
+./gradlew build
+```
+
+The source is organized by responsibility:
+
+- `equipment/attribute` contains the data stored on upgraded item stacks.
+- `service` contains gameplay rules for validating and applying each Aspect.
+- `recipe/aspect` connects those rules to the smithing-table recipe.
+- `event` contains client tooltip and mining-speed event handling.
+- `registry` owns NeoForge registrations.
+- `data/tempered/tags` holds datapack-configurable item eligibility.
+
+## Roadmap
+
+The planned direction is a broader system where Attributes are deliberate
+upgrades and Affixes are earned from equipment use. Affixes, Aspect acquisition,
+additional Attributes, and the dedicated Tempering Block are not implemented
+yet.
+
+## License
+
+All Rights Reserved.
