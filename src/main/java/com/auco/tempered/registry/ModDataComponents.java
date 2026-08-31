@@ -1,6 +1,7 @@
 package com.auco.tempered.registry;
 
 import com.auco.tempered.Tempered;
+import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
 import com.auco.tempered.equipment.attribute.swift.SwiftData;
 
@@ -37,6 +38,12 @@ public final class ModDataComponents {
             DATA_COMPONENTS.registerComponentType(
                     "swift_data",
                     builder -> builder.persistent(SwiftData.CODEC)
+            );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ExecutionerData>> EXECUTIONER_DATA =
+            DATA_COMPONENTS.registerComponentType(
+                    "executioner_data",
+                    builder -> builder.persistent(ExecutionerData.CODEC)
             );
 
     public static void register(IEventBus eventBus) {

@@ -1,9 +1,11 @@
 package com.auco.tempered.event;
 
 import com.auco.tempered.Tempered;
+import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
 import com.auco.tempered.equipment.attribute.swift.SwiftData;
 import com.auco.tempered.registry.ModDataComponents;
+import com.auco.tempered.service.ExecutionerService;
 import com.auco.tempered.service.SwiftService;
 
 import net.minecraft.ChatFormatting;
@@ -48,7 +50,12 @@ public final class ItemTooltipHandler {
 
         SwiftData swiftData = SwiftService.getActiveData(stack);
         if (swiftData != null) {
-            addSwiftTooltip(event, swiftData, insertIndex);
+            insertIndex = addSwiftTooltip(event, swiftData, insertIndex);
+        }
+
+        ExecutionerData executionerData = ExecutionerService.getProgressData(stack);
+        if (executionerData != null) {
+            addExecutionerTooltip(event, executionerData, insertIndex);
         }
     }
 
@@ -77,7 +84,7 @@ public final class ItemTooltipHandler {
         return insertIndex + 2;
     }
 
-    private static void addSwiftTooltip(
+    private static int addSwiftTooltip(
             ItemTooltipEvent event,
             SwiftData swiftData,
             int insertIndex
@@ -97,6 +104,57 @@ public final class ItemTooltipHandler {
                         swiftData.miningSpeedBonusPercent()
                 ).withStyle(ChatFormatting.BLUE)
         );
+
+        return insertIndex + 2;
+    }
+
+    private static void addExecutionerTooltip(
+            ItemTooltipEvent event,
+            ExecutionerData executionerData,
+            int insertIndex
+    ) {
+        if (!executionerData.isUnlocked()) {
+            event.getToolTip().add(
+                    safeInsertionIndex(event, insertIndex),
+                    Component.translatable("tooltip.tempered.executioner.awakening")
+                            .withStyle(ChatFormatting.DARK_GRAY)
+            );
+            event.getToolTip().add(
+                    safeInsertionIndex(event, insertIndex + 1),
+                    Component.translatable(
+                            "tooltip.tempered.executioner.progress",
+                            executionerData.hostileKills(),
+                            executionerData.nextMilestoneKills()
+                    ).withStyle(ChatFormatting.GRAY)
+            );
+            return;
+        }
+
+        event.getToolTip().add(
+                safeInsertionIndex(event, insertIndex),
+                Component.translatable(
+                        "tooltip.tempered.executioner.title",
+                        toRomanNumeral(executionerData.level())
+                ).withStyle(ChatFormatting.DARK_RED)
+        );
+        event.getToolTip().add(
+                safeInsertionIndex(event, insertIndex + 1),
+                Component.translatable(
+                        "tooltip.tempered.executioner.effect",
+                        executionerData.executeHealthPercent()
+                ).withStyle(ChatFormatting.RED)
+        );
+
+        if (executionerData.level() < ExecutionerData.MAX_LEVEL) {
+            event.getToolTip().add(
+                    safeInsertionIndex(event, insertIndex + 2),
+                    Component.translatable(
+                            "tooltip.tempered.executioner.progress",
+                            executionerData.hostileKills(),
+                            executionerData.nextMilestoneKills()
+                    ).withStyle(ChatFormatting.GRAY)
+            );
+        }
     }
 
     private static int safeInsertionIndex(ItemTooltipEvent event, int requestedIndex) {

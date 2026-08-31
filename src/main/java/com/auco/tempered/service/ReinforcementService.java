@@ -110,4 +110,15 @@ public final class ReinforcementService {
                 ReinforcedData.calculateMaxDamage(baseMaxDamage, newLevel)
         );
     }
+
+    /**
+     * Returns the stack's valid Reinforced data, or {@code null} when absent
+     * or invalid. Unlike {@link SwiftService#getActiveData(ItemStack)}, no
+     * tag gate is applied because Reinforced eligibility is damageability,
+     * which the component's presence already implies.
+     */
+    public static ReinforcedData getActiveData(ItemStack stack) {
+        ReinforcedData data = stack.get(ModDataComponents.REINFORCED_DATA.get());
+        return data != null && data.isValid() ? data : null;
+    }
 }

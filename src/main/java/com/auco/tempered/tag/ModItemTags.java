@@ -10,9 +10,15 @@ import net.minecraft.world.item.Item;
 /** Item tags that let datapacks configure Tempered's gameplay rules. */
 public final class ModItemTags {
 
+    /** Weapons that can earn and use the Executioner affix. */
+    public static final TagKey<Item> EXECUTIONER_APPLICABLE = TagKey.create(
+            Registries.ITEM,
+            ResourceLocation.fromNamespaceAndPath(Tempered.MODID, "executioner_applicable")
+    );
+
     /**
      * Declares which items can receive Swift. Its default JSON definition
-     * includes {@code #c:tools}, while datapacks can extend or narrow it.
+     * includes vanilla mining-tool tags, while datapacks can extend it.
      */
     public static final TagKey<Item> SWIFT_APPLICABLE = TagKey.create(
             Registries.ITEM,
