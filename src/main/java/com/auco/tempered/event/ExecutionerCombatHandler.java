@@ -3,6 +3,9 @@ package com.auco.tempered.event;
 import com.auco.tempered.Tempered;
 import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
 import com.auco.tempered.service.ExecutionerService;
+import com.auco.tempered.equipment.affix.executioner.ExecutionerRules;
+import com.auco.tempered.config.TemperedConfig;
+import com.auco.tempered.util.Probability;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,6 +36,8 @@ public final class ExecutionerCombatHandler {
             return;
         }
 
+        if (!Probability.succeeds(ExecutionerRules.executeChance(data), event.getEntity().getRandom()::nextDouble)) return;
+
         // Modify this damage sequence instead of creating a second hit. Vanilla
         // can then retain attribution, loot, advancements, and Totem handling.
         event.setNewDamage(Math.max(
@@ -49,7 +54,7 @@ public final class ExecutionerCombatHandler {
     public static void onLivingDeath(LivingDeathEvent event) {
         if (!ExecutionerService.isEligibleTarget(event.getEntity())
                 || !(event.getSource().getEntity() instanceof ServerPlayer player)
-                || player.isCreative()) {
+                || (player.isCreative() && !TemperedConfig.active().executioner().allowCreativeProgression())) {
             return;
         }
 
@@ -58,14 +63,18 @@ public final class ExecutionerCombatHandler {
             return;
         }
 
+        var settings = TemperedConfig.active().executioner();
+        if (!settings.enabled() || !settings.progressionEnabled()
+                || !Probability.succeeds(settings.progressChance(), player.getRandom()::nextDouble)) return;
+
         ExecutionerData previous = ExecutionerService.getProgressData(weapon);
-        int previousLevel = previous == null ? 0 : previous.level();
+        int previousLevel = previous == null ? 0 : ExecutionerRules.level(previous);
         ExecutionerData updated = ExecutionerService.recordHostileKill(weapon);
-        if (updated != null && updated.level() > previousLevel) {
+        if (settings.announceTierUp() && updated != null && ExecutionerRules.level(updated) > previousLevel) {
             player.displayClientMessage(
                     Component.translatable(
                             "message.tempered.executioner.level_up",
-                            toRomanNumeral(updated.level()),
+                            toRomanNumeral(ExecutionerRules.level(updated)),
                             weapon.getHoverName()
                     ),
                     false

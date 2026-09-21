@@ -108,6 +108,11 @@ neoForge {
             sourceSet(sourceSets.main)
         }
     }
+
+    unitTest {
+        enable()
+        testedMod = mods.tempered
+    }
 }
 
 // Sets up a dependency configuration called 'localRuntime'.
@@ -119,6 +124,10 @@ configurations {
 }
 
 dependencies {
+    testImplementation platform("org.junit:junit-bom:5.11.4")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testImplementation "net.neoforged:testframework:${neo_version}"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
     // JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
@@ -190,4 +199,21 @@ idea {
         downloadSources = true
         downloadJavadoc = true
     }
+}
+
+// The example is generated from the same spec as the live config. Tests reject stale documentation.
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
+    systemProperty 'tempered.projectDir', project.projectDir.absolutePath
+    inputs.file('config.toml.example')
+}
+
+tasks.register('updateConfigExample', JavaExec) {
+    group = 'documentation'
+    description = 'Regenerate config.toml.example from the registered defaults and explanations.'
+    dependsOn tasks.named('testClasses')
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.auco.tempered.config.ConfigExample'
+    systemProperty 'tempered.projectDir', project.projectDir.absolutePath
+    workingDir = layout.buildDirectory.get().asFile
 }

@@ -17,6 +17,7 @@ public record ReinforcementResult(
     /** The possible outcomes before an item stack is changed. */
     public enum Status {
         SUCCESS,
+        DISABLED,
         NOT_DAMAGEABLE,
         INVALID_DATA,
         MAX_LEVEL

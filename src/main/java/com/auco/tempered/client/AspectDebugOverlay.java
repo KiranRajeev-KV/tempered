@@ -2,8 +2,11 @@ package com.auco.tempered.client;
 
 import com.auco.tempered.Tempered;
 import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
+import com.auco.tempered.equipment.affix.executioner.ExecutionerRules;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
+import com.auco.tempered.equipment.attribute.reinforced.ReinforcedRules;
 import com.auco.tempered.equipment.attribute.swift.SwiftData;
+import com.auco.tempered.equipment.attribute.swift.SwiftRules;
 import com.auco.tempered.service.ExecutionerService;
 import com.auco.tempered.service.ReinforcementService;
 import com.auco.tempered.service.SwiftService;
@@ -94,18 +97,18 @@ public final class AspectDebugOverlay {
         if (reinforcedData != null) {
             lines.add(Component.translatable(
                     "tooltip.tempered.reinforced.title",
-                    toRomanNumeral(reinforcedData.level())
+                    toRomanNumeral(ReinforcedRules.level(reinforcedData))
             ).withStyle(ChatFormatting.AQUA));
             lines.add(Component.translatable(
                     "hud.tempered.reinforced.max_damage",
                     reinforcedData.baseMaxDamage(),
-                    reinforcedData.reinforcedMaxDamage()
+                    ReinforcedRules.maxDamage(reinforcedData)
             ));
         }
         if (swiftData != null) {
             lines.add(Component.translatable(
                     "tooltip.tempered.swift.title",
-                    toRomanNumeral(swiftData.level())
+                    toRomanNumeral(SwiftRules.level(swiftData))
             ).withStyle(ChatFormatting.GOLD));
             Component speedLine = resolveBreakSpeedLine(player, minecraft, swiftData);
             if (speedLine != null) {
@@ -129,17 +132,17 @@ public final class AspectDebugOverlay {
             Minecraft minecraft,
             ExecutionerData data
     ) {
-        if (data.isUnlocked()) {
+        if (ExecutionerRules.unlocked(data)) {
             lines.add(Component.translatable(
                     "tooltip.tempered.executioner.title",
-                    toRomanNumeral(data.level())
+                    toRomanNumeral(ExecutionerRules.level(data))
             ).withStyle(ChatFormatting.DARK_RED));
         } else {
             lines.add(Component.translatable("hud.tempered.executioner.awakening")
                     .withStyle(ChatFormatting.DARK_RED));
         }
 
-        if (data.level() >= ExecutionerData.MAX_LEVEL) {
+        if (ExecutionerRules.level(data) >= ExecutionerRules.maxLevel()) {
             lines.add(Component.translatable(
                     "hud.tempered.executioner.kills_max",
                     data.hostileKills()
@@ -148,15 +151,19 @@ public final class AspectDebugOverlay {
             lines.add(Component.translatable(
                     "hud.tempered.executioner.kills",
                     data.hostileKills(),
-                    data.nextMilestoneKills()
+                    ExecutionerRules.nextMilestone(data)
             ));
         }
 
-        if (data.isUnlocked()) {
+        if (ExecutionerRules.unlocked(data)) {
             lines.add(Component.translatable(
                     "hud.tempered.executioner.threshold",
-                    data.executeHealthPercent()
+                    ExecutionerRules.healthPercent(data)
             ).withStyle(ChatFormatting.RED));
+            lines.add(Component.translatable(
+                    "hud.tempered.executioner.chance",
+                    formatNumber((float) (ExecutionerRules.executeChance(data) * 100))
+            ).withStyle(ChatFormatting.GRAY));
         } else {
             lines.add(Component.translatable("hud.tempered.executioner.threshold_locked")
                     .withStyle(ChatFormatting.GRAY));
@@ -195,17 +202,17 @@ public final class AspectDebugOverlay {
                 formatNumber(healthPercent)
         ));
 
-        if (!data.isUnlocked()) {
+        if (!ExecutionerRules.unlocked(data)) {
             lines.add(Component.translatable("hud.tempered.executioner.target_locked")
                     .withStyle(ChatFormatting.GRAY));
             return;
         }
 
-        float thresholdHealth = maxHealth * data.executeHealthPercent() / 100.0F;
+        float thresholdHealth = maxHealth * (float) ExecutionerRules.healthPercent(data) / 100.0F;
         lines.add(Component.translatable(
                 "hud.tempered.executioner.target_threshold",
                 formatNumber(thresholdHealth),
-                data.executeHealthPercent()
+                ExecutionerRules.healthPercent(data)
         ));
 
         boolean executable = currentHealth > 0.0F && currentHealth <= thresholdHealth;
@@ -258,7 +265,7 @@ public final class AspectDebugOverlay {
 
         float effectiveSpeed = baseSpeed;
         if (swiftData != null) {
-            effectiveSpeed *= swiftData.miningSpeedMultiplier();
+            effectiveSpeed *= SwiftRules.multiplier(swiftData);
         }
 
         return Component.translatable(

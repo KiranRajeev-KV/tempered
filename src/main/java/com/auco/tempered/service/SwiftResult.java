@@ -23,6 +23,7 @@ public record SwiftResult(Status status, int previousLevel, int newLevel) {
 
     public enum Status {
         SUCCESS,
+        DISABLED,
         NOT_SWIFT_APPLICABLE,
         MAX_LEVEL,
         INVALID_DATA

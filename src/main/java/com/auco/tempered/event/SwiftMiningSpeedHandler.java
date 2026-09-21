@@ -2,6 +2,7 @@ package com.auco.tempered.event;
 
 import com.auco.tempered.Tempered;
 import com.auco.tempered.equipment.attribute.swift.SwiftData;
+import com.auco.tempered.equipment.attribute.swift.SwiftRules;
 import com.auco.tempered.service.SwiftService;
 
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +26,7 @@ public final class SwiftMiningSpeedHandler {
         // getNewSpeed includes vanilla and earlier mod adjustments. Multiplying
         // it makes Swift compose with effects such as Haste and Efficiency
         // instead of replacing the player's calculated mining speed.
-        event.setNewSpeed(event.getNewSpeed() * swiftData.miningSpeedMultiplier());
+        event.setNewSpeed(event.getNewSpeed() * SwiftRules.multiplier(swiftData));
     }
 
     private SwiftMiningSpeedHandler() {

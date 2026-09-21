@@ -2,11 +2,14 @@ package com.auco.tempered.event;
 
 import com.auco.tempered.Tempered;
 import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
+import com.auco.tempered.equipment.affix.executioner.ExecutionerRules;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
+import com.auco.tempered.equipment.attribute.reinforced.ReinforcedRules;
 import com.auco.tempered.equipment.attribute.swift.SwiftData;
-import com.auco.tempered.registry.ModDataComponents;
+import com.auco.tempered.equipment.attribute.swift.SwiftRules;
 import com.auco.tempered.service.ExecutionerService;
 import com.auco.tempered.service.SwiftService;
+import com.auco.tempered.service.ReinforcementService;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -43,7 +46,7 @@ public final class ItemTooltipHandler {
 
         int insertIndex = REINFORCEMENT_TOOLTIP_INDEX;
 
-        ReinforcedData reinforcedData = stack.get(ModDataComponents.REINFORCED_DATA.get());
+        ReinforcedData reinforcedData = ReinforcementService.getActiveData(stack);
         if (reinforcedData != null && reinforcedData.isValid()) {
             insertIndex = addReinforcedTooltip(event, reinforcedData, insertIndex);
         }
@@ -68,7 +71,7 @@ public final class ItemTooltipHandler {
                 safeInsertionIndex(event, insertIndex),
                 Component.translatable(
                         "tooltip.tempered.reinforced.title",
-                        toRomanNumeral(reinforcedData.level())
+                        toRomanNumeral(ReinforcedRules.level(reinforcedData))
                 )
                         .withStyle(ChatFormatting.AQUA)
         );
@@ -77,7 +80,7 @@ public final class ItemTooltipHandler {
                 safeInsertionIndex(event, insertIndex + 1),
                 Component.translatable(
                         "tooltip.tempered.reinforced.durability",
-                        reinforcedData.durabilityBonusPercent()
+                        ReinforcedRules.bonusPercent(reinforcedData)
                 ).withStyle(ChatFormatting.BLUE)
         );
 
@@ -93,7 +96,7 @@ public final class ItemTooltipHandler {
                 safeInsertionIndex(event, insertIndex),
                 Component.translatable(
                         "tooltip.tempered.swift.title",
-                        toRomanNumeral(swiftData.level())
+                        toRomanNumeral(SwiftRules.level(swiftData))
                 ).withStyle(ChatFormatting.GOLD)
         );
 
@@ -101,7 +104,7 @@ public final class ItemTooltipHandler {
                 safeInsertionIndex(event, insertIndex + 1),
                 Component.translatable(
                         "tooltip.tempered.swift.mining_speed",
-                        swiftData.miningSpeedBonusPercent()
+                        SwiftRules.bonusPercent(swiftData)
                 ).withStyle(ChatFormatting.BLUE)
         );
 
@@ -113,7 +116,7 @@ public final class ItemTooltipHandler {
             ExecutionerData executionerData,
             int insertIndex
     ) {
-        if (!executionerData.isUnlocked()) {
+        if (!ExecutionerRules.unlocked(executionerData)) {
             event.getToolTip().add(
                     safeInsertionIndex(event, insertIndex),
                     Component.translatable("tooltip.tempered.executioner.awakening")
@@ -124,7 +127,7 @@ public final class ItemTooltipHandler {
                     Component.translatable(
                             "tooltip.tempered.executioner.progress",
                             executionerData.hostileKills(),
-                            executionerData.nextMilestoneKills()
+                            ExecutionerRules.nextMilestone(executionerData)
                     ).withStyle(ChatFormatting.GRAY)
             );
             return;
@@ -134,24 +137,34 @@ public final class ItemTooltipHandler {
                 safeInsertionIndex(event, insertIndex),
                 Component.translatable(
                         "tooltip.tempered.executioner.title",
-                        toRomanNumeral(executionerData.level())
+                        toRomanNumeral(ExecutionerRules.level(executionerData))
                 ).withStyle(ChatFormatting.DARK_RED)
         );
         event.getToolTip().add(
                 safeInsertionIndex(event, insertIndex + 1),
                 Component.translatable(
                         "tooltip.tempered.executioner.effect",
-                        executionerData.executeHealthPercent()
+                        ExecutionerRules.healthPercent(executionerData)
                 ).withStyle(ChatFormatting.RED)
         );
 
-        if (executionerData.level() < ExecutionerData.MAX_LEVEL) {
+        double chance = ExecutionerRules.executeChance(executionerData);
+        if (chance < 1) {
+            event.getToolTip().add(
+                    safeInsertionIndex(event, insertIndex + 2),
+                    Component.translatable("tooltip.tempered.executioner.chance", chance * 100)
+                            .withStyle(ChatFormatting.GRAY)
+            );
+            insertIndex++;
+        }
+
+        if (ExecutionerRules.level(executionerData) < ExecutionerRules.maxLevel()) {
             event.getToolTip().add(
                     safeInsertionIndex(event, insertIndex + 2),
                     Component.translatable(
                             "tooltip.tempered.executioner.progress",
                             executionerData.hostileKills(),
-                            executionerData.nextMilestoneKills()
+                            ExecutionerRules.nextMilestone(executionerData)
                     ).withStyle(ChatFormatting.GRAY)
             );
         }

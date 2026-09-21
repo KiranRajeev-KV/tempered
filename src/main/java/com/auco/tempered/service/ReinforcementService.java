@@ -1,6 +1,8 @@
 package com.auco.tempered.service;
 
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
+import com.auco.tempered.equipment.attribute.reinforced.ReinforcedRules;
+import com.auco.tempered.config.TemperedConfig;
 import com.auco.tempered.registry.ModDataComponents;
 
 import net.minecraft.core.component.DataComponents;
@@ -19,6 +21,9 @@ public final class ReinforcementService {
     }
 
     public static ReinforcementResult inspect(ItemStack targetStack) {
+        if (!TemperedConfig.active().reinforced().enabled()) {
+            return new ReinforcementResult(ReinforcementResult.Status.DISABLED, 0, 0, 0, 0);
+        }
         // "All equipment" currently means every item with a durability bar.
         // This naturally includes vanilla tools, weapons, armor, shields, and
         // other damageable equipment without maintaining a large item list.
@@ -53,7 +58,7 @@ public final class ReinforcementService {
             );
         }
 
-        if (currentData.level() >= ReinforcedData.MAX_LEVEL) {
+        if (currentData.level() >= TemperedConfig.active().reinforced().maxLevel()) {
             return new ReinforcementResult(
                     ReinforcementResult.Status.MAX_LEVEL,
                     currentData.level(),
@@ -78,6 +83,9 @@ public final class ReinforcementService {
             return result;
         }
 
+        reconcile(targetStack);
+        result = inspect(targetStack);
+
         ReinforcedData currentData = targetStack.get(
                 ModDataComponents.REINFORCED_DATA.get()
         );
@@ -91,7 +99,13 @@ public final class ReinforcementService {
                 ModDataComponents.REINFORCED_DATA.get(),
                 new ReinforcedData(result.newLevel(), baseMaxDamage)
         );
+        // A nonlinear configuration can reduce durability at the next level.
+        int damage = targetStack.getDamageValue();
+        if (result.newMaxDamage() < result.previousMaxDamage()) {
+            damage = ReinforcedRules.scaledDamage(damage, result.previousMaxDamage(), result.newMaxDamage());
+        }
         targetStack.set(DataComponents.MAX_DAMAGE, result.newMaxDamage());
+        targetStack.setDamageValue(damage);
 
         return result;
     }
@@ -107,7 +121,7 @@ public final class ReinforcementService {
                 currentLevel,
                 newLevel,
                 currentMaxDamage,
-                ReinforcedData.calculateMaxDamage(baseMaxDamage, newLevel)
+                ReinforcedRules.maxDamage(baseMaxDamage, newLevel, TemperedConfig.active().reinforced())
         );
     }
 
@@ -119,6 +133,18 @@ public final class ReinforcementService {
      */
     public static ReinforcedData getActiveData(ItemStack stack) {
         ReinforcedData data = stack.get(ModDataComponents.REINFORCED_DATA.get());
-        return data != null && data.isValid() ? data : null;
+        return TemperedConfig.active().reinforced().enabled() && data != null && data.isValid() ? data : null;
     }
+    /** Lazy server-side reconciliation for carried and newly encountered equipment. */
+    public static void reconcile(ItemStack stack) {
+        ReinforcedData data = stack.get(ModDataComponents.REINFORCED_DATA.get());
+        if (data == null || !data.isValid() || !stack.isDamageableItem()) return;
+        int oldMaximum = stack.getMaxDamage();
+        int newMaximum = ReinforcedRules.maxDamage(data);
+        if (oldMaximum == newMaximum) return;
+        int newDamage = ReinforcedRules.scaledDamage(stack.getDamageValue(), oldMaximum, newMaximum);
+        stack.set(DataComponents.MAX_DAMAGE, newMaximum);
+        stack.setDamageValue(newDamage);
+    }
+
 }

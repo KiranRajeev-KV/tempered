@@ -1,6 +1,8 @@
 package com.auco.tempered.service;
 
 import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
+import com.auco.tempered.equipment.affix.executioner.ExecutionerRules;
+import com.auco.tempered.config.TemperedConfig;
 import com.auco.tempered.registry.ModDataComponents;
 import com.auco.tempered.tag.ModEntityTypeTags;
 import com.auco.tempered.tag.ModItemTags;
@@ -46,7 +48,7 @@ public final class ExecutionerService {
 
     /** Returns valid progression data, including progress before Tier I. */
     public static ExecutionerData getProgressData(ItemStack stack) {
-        if (!stack.is(ModItemTags.EXECUTIONER_APPLICABLE)) {
+        if (!TemperedConfig.active().executioner().enabled() || !stack.is(ModItemTags.EXECUTIONER_APPLICABLE)) {
             return null;
         }
 
@@ -57,32 +59,30 @@ public final class ExecutionerService {
     /** Returns data only after the affix has reached Tier I. */
     public static ExecutionerData getActiveData(ItemStack stack) {
         ExecutionerData data = getProgressData(stack);
-        return data != null && data.isUnlocked() ? data : null;
+        return data != null && ExecutionerRules.unlocked(data) ? data : null;
     }
 
     /**
      * Records one direct hostile kill and returns the new value. The component
-     * is capped at Tier III so maxed weapons do not receive pointless updates.
+     * preserves history beyond the current top tier and saturates at the integer limit.
      */
     public static ExecutionerData recordHostileKill(ItemStack weapon) {
-        if (!weapon.is(ModItemTags.EXECUTIONER_APPLICABLE)) {
+        var settings = TemperedConfig.active().executioner();
+        if (!settings.enabled() || !settings.progressionEnabled() || !weapon.is(ModItemTags.EXECUTIONER_APPLICABLE)) {
             return null;
         }
 
         ExecutionerData current = weapon.get(ModDataComponents.EXECUTIONER_DATA.get());
         if (current == null) {
-            ExecutionerData firstKill = new ExecutionerData(1);
+            ExecutionerData firstKill = new ExecutionerData(settings.advance(0));
             weapon.set(ModDataComponents.EXECUTIONER_DATA.get(), firstKill);
             return firstKill;
         }
         if (!current.isValid()) {
             return null;
         }
-        if (current.hostileKills() >= ExecutionerData.MAX_TRACKED_KILLS) {
-            return current;
-        }
-
-        ExecutionerData updated = current.withOneMoreKill();
+        ExecutionerData updated = new ExecutionerData(settings.advance(current.hostileKills()));
+        if (updated.equals(current)) return current;
         weapon.set(ModDataComponents.EXECUTIONER_DATA.get(), updated);
         return updated;
     }
@@ -96,7 +96,7 @@ public final class ExecutionerService {
             float damageBeforeAbsorption,
             ExecutionerData data
     ) {
-        if (damageBeforeAbsorption <= 0.0F || !data.isUnlocked()) {
+        if (damageBeforeAbsorption <= 0.0F || !ExecutionerRules.unlocked(data)) {
             return false;
         }
 
@@ -110,7 +110,7 @@ public final class ExecutionerService {
 
         float projectedHealth = target.getHealth() - healthDamage;
         float executeThreshold = target.getMaxHealth()
-                * data.executeHealthPercent()
+                * (float) ExecutionerRules.healthPercent(data)
                 / 100.0F;
 
         // A naturally lethal hit needs no adjustment and is not an execution.

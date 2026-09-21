@@ -18,7 +18,8 @@ Apply an Aspect at a smithing table:
 4. Take the result to apply the next level and consume one Aspect.
 
 The result keeps the original item's enchantments, custom name, damage, and
-other stack data. An Aspect cannot be applied past level V.
+other stack data. By default, an Aspect cannot be applied past level V.
+The configuration can change each Aspect's bonuses and level cap independently.
 
 ### Reinforced Aspect
 
@@ -66,9 +67,9 @@ hostile enemy at or below the current threshold becomes lethal.
 
 | Tier | Total hostile kills | Execute threshold |
 | --- | ---: | ---: |
-| I | 64 | 5% health |
-| II | 192 | 10% health |
-| III | 384 | 15% health |
+| I | 2 | 5% health |
+| II | 5 | 10% health |
+| III | 10 | 15% health |
 
 Executioner uses the target's current maximum health and accounts for
 absorption. It works on vanilla bosses, preserves normal loot and death credit,
@@ -77,6 +78,38 @@ controlled by [`tempered:executioner_applicable`](src/main/resources/data/temper
 Datapacks can exempt special or scripted hostile mobs through the empty-by-default
 [`tempered:executioner_immune`](src/main/resources/data/tempered/tags/entity_type/executioner_immune.json)
 entity-type tag.
+
+## Configuration
+
+All gameplay settings live in **`config/tempered/config.toml`**, generated when
+a world/server first starts. Use [`config.toml.example`](config.toml.example)
+as the reference: it documents every key, default, valid range, and unit.
+The tables above show defaults; each Aspect and Affix can be tuned independently.
+
+Settings are server-authoritative and require a **world/server restart**.
+Connected clients receive the server's active settings, including players joining
+after the file was edited with changes pending. An existing file at
+`<world>/serverconfig/tempered/config.toml` overrides the normal file; only use
+an override if you deliberately want world-specific balance.
+
+Aspect bonus lists contain the total bonus at each level, and their length sets
+the level cap. Executioner's three tier lists must have matching lengths, and
+its milestones must increase. Chances are probabilities from `0.0` (never) to
+`1.0` (always); `0.25` means 25%. Aspect application remains deterministic.
+Only qualifying melee deaths/hits roll for Executioner progress/execution.
+When progress per success is greater than one, the saved counter represents
+progress points rather than literal kills. Executioner continues recording
+history beyond the highest configured tier, saturating at the integer limit.
+
+Disabling a mechanic or lowering its cap preserves saved levels and progress.
+Re-enabling it or raising the cap makes that history available again.
+Existing Reinforced equipment recalculates when carried or applied in smithing,
+preserving its remaining durability fraction. Unloaded storage is reconciled
+when brought into use. Individual invalid values revert to defaults through
+NeoForge; mismatched Executioner tier-list lengths use the complete default
+Executioner section and log an explanation.
+
+Eligibility tags and acquisition recipes remain datapack-controlled.
 
 ## Development
 
@@ -92,6 +125,8 @@ Useful Gradle commands:
 ./gradlew runClient
 ./gradlew runServer
 ./gradlew build
+./gradlew test
+./gradlew updateConfigExample
 ```
 
 Development builds include a compact equipment debug overlay above the hotbar.
@@ -102,11 +137,19 @@ status. The overlay is disabled automatically in production builds.
 The source is organized by responsibility:
 
 - `equipment` contains immutable Attribute and Affix data stored on item stacks.
-- `service` contains gameplay rules for Attributes and Affixes.
+- `equipment` also contains rules that derive effective levels and bonuses from settings.
+- `config` declares typed sections and the immutable active gameplay snapshot.
+- `service` validates and applies changes to equipment.
+- `network` synchronizes active settings when players join.
 - `recipe/aspect` connects those rules to the smithing-table recipe.
 - `event` contains tooltip, mining-speed, and affix combat event handling.
 - `registry` owns NeoForge registrations.
 - `data/tempered/tags` holds datapack-configurable item and entity eligibility.
+
+Whenever config keys, defaults, or explanations change, run
+`./gradlew updateConfigExample` and commit the updated reference. The test suite
+checks the reference against the registered specification, so stale examples
+fail the build.
 
 ## Roadmap
 

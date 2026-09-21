@@ -2,6 +2,7 @@ package com.auco.tempered.service;
 
 import com.auco.tempered.equipment.attribute.swift.SwiftData;
 import com.auco.tempered.registry.ModDataComponents;
+import com.auco.tempered.config.TemperedConfig;
 import com.auco.tempered.tag.ModItemTags;
 
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +15,9 @@ public final class SwiftService {
      * client and server lets the interaction pipeline agree on the outcome.
      */
     public static SwiftResult inspect(ItemStack targetStack) {
+        if (!TemperedConfig.active().swift().enabled()) {
+            return SwiftResult.failure(SwiftResult.Status.DISABLED);
+        }
         if (!targetStack.is(ModItemTags.SWIFT_APPLICABLE)) {
             return SwiftResult.failure(SwiftResult.Status.NOT_SWIFT_APPLICABLE);
         }
@@ -27,7 +31,7 @@ public final class SwiftService {
             return SwiftResult.failure(SwiftResult.Status.INVALID_DATA);
         }
 
-        if (currentData.level() >= SwiftData.MAX_LEVEL) {
+        if (currentData.level() >= TemperedConfig.active().swift().maxLevel()) {
             return SwiftResult.failure(SwiftResult.Status.MAX_LEVEL);
         }
 
@@ -59,7 +63,7 @@ public final class SwiftService {
      * immediately instead of granting a stale bonus.
      */
     public static SwiftData getActiveData(ItemStack stack) {
-        if (!stack.is(ModItemTags.SWIFT_APPLICABLE)) {
+        if (!TemperedConfig.active().swift().enabled() || !stack.is(ModItemTags.SWIFT_APPLICABLE)) {
             return null;
         }
 
