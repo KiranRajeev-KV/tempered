@@ -4,6 +4,8 @@ import com.auco.tempered.config.aspect.ReinforcedConfig;
 import com.auco.tempered.config.aspect.SwiftConfig;
 import com.auco.tempered.config.affix.ExecutionerConfig;
 import com.auco.tempered.config.affix.ExecutionerSettings;
+import com.auco.tempered.config.acquisition.AspectLootConfig;
+import com.auco.tempered.config.acquisition.AcquisitionSettings;
 import com.mojang.logging.LogUtils;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -23,6 +25,8 @@ public final class TemperedConfig {
     private final ReinforcedConfig reinforced;
     private final SwiftConfig swift;
     private final ExecutionerConfig executioner;
+    private final AspectLootConfig reinforcedLoot;
+    private final AspectLootConfig swiftLoot;
 
     private TemperedConfig(ModConfigSpec.Builder builder) {
         builder.translation("tempered.config.aspects").push("aspects").pop();
@@ -30,6 +34,8 @@ public final class TemperedConfig {
         reinforced = new ReinforcedConfig(builder);
         swift = new SwiftConfig(builder);
         executioner = new ExecutionerConfig(builder);
+        reinforcedLoot = new AspectLootConfig(builder, "reinforced");
+        swiftLoot = new AspectLootConfig(builder, "swift");
     }
 
     public static GameplaySettings active() { return active; }
@@ -44,7 +50,8 @@ public final class TemperedConfig {
             LogUtils.getLogger().error("Invalid affixes.executioner section: {}. Using the complete default Executioner section until restart.", exception.getMessage());
             executionerSettings = ExecutionerSettings.DEFAULT;
         }
-        activate(new GameplaySettings(CONFIG.reinforced.read(), CONFIG.swift.read(), executionerSettings));
+        activate(new GameplaySettings(CONFIG.reinforced.read(), CONFIG.swift.read(), executionerSettings,
+                new AcquisitionSettings(CONFIG.reinforcedLoot.read(), CONFIG.swiftLoot.read())));
     }
 
 }

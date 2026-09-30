@@ -8,6 +8,27 @@ tempering system later.
 
 ## Current features
 
+### Finding Aspects in survival
+
+Find Reinforced and Swift Aspects in dungeon chests, abandoned mineshaft chest
+minecarts, desert pyramid chests, and jungle temple reward chests. Each Aspect
+has an independent **15% chance** to appear when eligible loot generates, granting
+**one Aspect** by default. A container can contain either, both, or neither.
+Aspects have no crafting acquisition recipes; use found Aspects at a smithing table.
+
+`acquisition.reinforced` and `acquisition.swift` in `config.toml` independently
+control acquisition, chance, quantity, and exact source loot-table IDs. Modded
+container tables can be added by ID. Empty source lists disable all sources;
+unknown IDs are inert and duplicate IDs count once. Disabling an Aspect mechanic
+also suppresses its loot, while disabling acquisition alone retains usable
+existing Aspects and upgraded equipment.
+
+Existing generated loot is unchanged. Unopened containers whose loot is still
+pending can receive Aspects, including in existing worlds. Reopening or emptying
+a generated container never rerolls loot. Ordinary storage chests receive nothing.
+Loot modifiers append rewards alongside existing loot; other mods and datapacks
+can still modify the combined result, and containers remain subject to slot limits.
+
 ### Applying Aspects
 
 Apply an Aspect at a smithing table:
@@ -105,6 +126,9 @@ the level cap. Executioner's three tier lists must have matching lengths, and
 its milestones must increase. Chances are probabilities from `0.0` (never) to
 `1.0` (always); `0.25` means 25%. Aspect application remains deterministic.
 Only qualifying melee deaths/hits roll for Executioner progress/execution.
+Aspect acquisition rolls only for its configured source tables. Acquisition count
+ranges are inclusive (1-16); an inverted range uses default counts (1, 1) and logs
+an explanation while preserving the other settings in that section.
 When progress per success is greater than one, the saved counter represents
 progress points rather than literal kills. Executioner continues recording
 history beyond the highest configured tier, saturating at the integer limit.
@@ -117,7 +141,8 @@ when brought into use. Individual invalid values revert to defaults through
 NeoForge; mismatched Executioner tier-list lengths use the complete default
 Executioner section and log an explanation.
 
-Eligibility tags and acquisition recipes remain datapack-controlled.
+Eligibility tags and loot modifier registration remain datapack-controlled.
+Acquisition balance and source lists use the single TOML file.
 
 ## Development
 
@@ -150,6 +175,7 @@ The source is organized by responsibility:
 - `config` declares typed sections and the immutable active gameplay snapshot.
 - `service` validates and applies changes to equipment.
 - `network` synchronizes active settings when players join.
+- `loot` adds configured Aspect rewards through NeoForge Global Loot Modifiers.
 - `recipe/aspect` connects those rules to the smithing-table recipe.
 - `event` contains tooltip, mining-speed, and affix combat event handling.
 - `registry` owns NeoForge registrations.
@@ -162,16 +188,17 @@ fail the build.
 
 `build` runs both verification suites. `test` checks configuration and registered
 equipment data. `runGameTestServer`
-runs four focused gameplay scenarios in a real Minecraft world, covering combat
-attribution, cancellation, execution, smithing consumption, and saved equipment.
+runs six focused gameplay scenarios in a real Minecraft world, covering combat
+attribution, cancellation, execution, smithing consumption, saved equipment,
+Aspect loot generation, and container reopening.
 These tests and their immunity-tag fixture live in `src/gameTest` and load only
 in that run; they are excluded from the distributed mod and normal play runs.
 
 ## Roadmap
 
 The planned direction is a broader system where Attributes are deliberate
-upgrades and more Affixes are earned from equipment use. Aspect acquisition,
-additional Attributes and Affixes, and the dedicated Tempering Block are not
+upgrades and more Affixes are earned from equipment use. Additional acquisition
+sources, Attributes and Affixes, and the dedicated Tempering Block are not
 implemented yet.
 
 ## License

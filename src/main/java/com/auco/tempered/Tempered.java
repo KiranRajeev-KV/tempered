@@ -4,6 +4,7 @@ import com.auco.tempered.registry.ModCreativeTabs;
 import com.auco.tempered.registry.ModDataComponents;
 import com.auco.tempered.registry.ModItems;
 import com.auco.tempered.registry.ModRecipeSerializers;
+import com.auco.tempered.registry.ModLootModifiers;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
@@ -27,6 +28,7 @@ public class Tempered {
         ModDataComponents.register(modEventBus);
         ModItems.register(modEventBus);
         ModRecipeSerializers.register(modEventBus);
+        ModLootModifiers.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
     }
 }

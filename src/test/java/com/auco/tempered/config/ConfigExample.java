@@ -28,7 +28,9 @@ public final class ConfigExample {
                 # Reinforced equipment recalculates when carried/used, retaining its remaining durability fraction.
                 # Executioner continues recording progress beyond the current highest tier (integer saturation).
                 # Aspects always apply successfully; no application chance or random smithing preview is used.
-                # Eligibility and acquisition recipes remain controlled by datapacks.
+                # Eligibility remains controlled by datapacks; Aspect acquisition uses the sections below.
+                # Aspects have no crafting acquisition recipes; found Aspects are applied through smithing.
+                # Inconsistent acquisition count ranges use the default counts (1, 1), preserving other settings.
                 # Example: a bonus list [5.0, 17.5] gives two levels with total bonuses of 5% and 17.5%.
                 # Example: use milestones [64, 192, 384] for slower Executioner progression.
                 # Example: execute chances [0.1, 0.3, 0.75] give 10%, 30%, 75% success at the three tiers.

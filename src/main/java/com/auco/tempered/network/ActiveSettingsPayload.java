@@ -2,6 +2,9 @@ package com.auco.tempered.network;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import com.auco.tempered.config.acquisition.AcquisitionSettings;
+import com.auco.tempered.config.acquisition.AspectLootSettings;
 import com.auco.tempered.Tempered;
 import com.auco.tempered.config.ConfigValues;
 import com.auco.tempered.config.GameplaySettings;
@@ -40,6 +43,8 @@ public record ActiveSettingsPayload(GameplaySettings settings) implements Custom
         writeDoubles(buffer, executioner.executeChances());
         buffer.writeBoolean(executioner.allowCreativeProgression());
         buffer.writeBoolean(executioner.announceTierUp());
+        writeLoot(buffer, settings.acquisition().reinforced());
+        writeLoot(buffer, settings.acquisition().swift());
     }
 
     private static GameplaySettings read(RegistryFriendlyByteBuf buffer) {
@@ -52,7 +57,29 @@ public record ActiveSettingsPayload(GameplaySettings settings) implements Custom
         for (int i = 0; i < count; i++) kills.add(buffer.readVarInt());
         var executioner = new ExecutionerSettings(enabled, progression, kills, readDoubles(buffer),
                 buffer.readDouble(), buffer.readVarInt(), readDoubles(buffer), buffer.readBoolean(), buffer.readBoolean());
-        return new GameplaySettings(reinforced, swift, executioner);
+        return new GameplaySettings(reinforced, swift, executioner,
+                new AcquisitionSettings(readLoot(buffer), readLoot(buffer)));
+    }
+
+    private static void writeLoot(RegistryFriendlyByteBuf buffer, AspectLootSettings settings) {
+        buffer.writeBoolean(settings.enabled());
+        buffer.writeDouble(settings.chance());
+        buffer.writeVarInt(settings.minCount());
+        buffer.writeVarInt(settings.maxCount());
+        buffer.writeVarInt(settings.lootTables().size());
+        settings.lootTables().stream().sorted().forEach(buffer::writeResourceLocation);
+    }
+
+    private static AspectLootSettings readLoot(RegistryFriendlyByteBuf buffer) {
+        boolean enabled = buffer.readBoolean();
+        double chance = buffer.readDouble();
+        int minimum = buffer.readVarInt();
+        int maximum = buffer.readVarInt();
+        int count = buffer.readVarInt();
+        if (count < 0 || count > AspectLootSettings.MAX_SOURCES) throw new DecoderException("Invalid Tempered loot source count: " + count);
+        var sources = new HashSet<ResourceLocation>();
+        for (int i = 0; i < count; i++) sources.add(buffer.readResourceLocation());
+        return new AspectLootSettings(enabled, chance, minimum, maximum, sources);
     }
 
     private static void writeDoubles(RegistryFriendlyByteBuf buffer, List<Double> values) {

@@ -8,6 +8,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.auco.tempered.config.aspect.ReinforcedSettings;
 import com.auco.tempered.config.aspect.SwiftSettings;
 import com.auco.tempered.config.affix.ExecutionerSettings;
+import com.auco.tempered.config.acquisition.AspectLootConfig;
+import com.auco.tempered.config.acquisition.AspectLootSettings;
+import net.minecraft.resources.ResourceLocation;
+import java.util.Set;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedRules;
 import com.auco.tempered.equipment.attribute.swift.SwiftData;
@@ -38,6 +42,23 @@ class ConfigurationTest {
         assertEquals(ExecutionerSettings.DEFAULT.killsRequired(), parsed.get("affixes.executioner.kills_required_by_tier"));
         assertFalse(ConfigValues.numbers(List.of(Double.NaN), 0, 1, false, false));
         assertFalse(ConfigValues.numbers(List.of(1.5), 1, 100, true, true));
+        parsed.set("acquisition.reinforced.loot_tables", List.of("minecraft:chests/Bad ID"));
+        parsed.set("acquisition.swift.loot_tables", List.of());
+        parsed.set("acquisition.swift.chance", 2.0);
+        TemperedConfig.SPEC.correct(parsed);
+        assertEquals(4, ((List<?>) parsed.get("acquisition.reinforced.loot_tables")).size());
+        assertEquals(List.of(), parsed.get("acquisition.swift.loot_tables"));
+        assertEquals(0.15, (double) parsed.get("acquisition.swift.chance"));
+        parsed.set("acquisition.swift.chance", Double.NaN);
+        TemperedConfig.SPEC.correct(parsed);
+        assertEquals(0.15, (double) parsed.get("acquisition.swift.chance"));
+        assertTrue(AspectLootConfig.validSources(List.of("othermod:chests/ruins")));
+        assertFalse(AspectLootConfig.validSources(List.of("chests/ruins")));
+        assertFalse(AspectLootConfig.validSources(List.of("minecraft:")));
+        assertThrows(IllegalArgumentException.class, () -> new AspectLootSettings(true, 1, 4, 2, Set.of()));
+        assertThrows(IllegalArgumentException.class, () -> new AspectLootSettings(true, 1, 1, 17, Set.of()));
+        assertThrows(UnsupportedOperationException.class, () -> AspectLootSettings.DEFAULT.lootTables()
+                .add(ResourceLocation.parse("othermod:chests/ruins")));
     }
 
     @Test
