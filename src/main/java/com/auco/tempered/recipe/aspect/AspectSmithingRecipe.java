@@ -43,7 +43,7 @@ public final class AspectSmithingRecipe implements SmithingRecipe {
         // Smithing consumes the original base stack after the player takes the
         // result, so work on a copy to keep the inventory transaction safe.
         if (!input.template().isEmpty()) return ItemStack.EMPTY;
-        ItemStack result = input.base().copy();
+        ItemStack result = input.base().copyWithCount(1);
 
         switch (aspectKind(input.addition())) {
             case REINFORCED -> {

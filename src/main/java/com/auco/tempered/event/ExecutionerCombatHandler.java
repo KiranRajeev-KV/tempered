@@ -4,20 +4,16 @@ import com.auco.tempered.Tempered;
 import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
 import com.auco.tempered.service.ExecutionerService;
 import com.auco.tempered.equipment.affix.executioner.ExecutionerRules;
-import com.auco.tempered.config.TemperedConfig;
 import com.auco.tempered.util.Probability;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
-/** Applies Executioner and advances it through direct hostile melee kills. */
+/** Applies Executioner inside the original melee damage sequence. */
 @EventBusSubscriber(modid = Tempered.MODID)
 public final class ExecutionerCombatHandler {
 
@@ -44,51 +40,6 @@ public final class ExecutionerCombatHandler {
                 event.getNewDamage(),
                 ExecutionerService.lethalDamage(event.getEntity())
         ));
-    }
-
-    /**
-     * LOWEST observes cancellations made by ordinary-priority handlers before
-     * mutating the weapon. Canceled death events are not delivered by default.
-     */
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onLivingDeath(LivingDeathEvent event) {
-        if (!ExecutionerService.isEligibleTarget(event.getEntity())
-                || !(event.getSource().getEntity() instanceof ServerPlayer player)
-                || (player.isCreative() && !TemperedConfig.active().executioner().allowCreativeProgression())) {
-            return;
-        }
-
-        ItemStack weapon = ExecutionerService.getDirectMeleeWeapon(event.getSource());
-        if (weapon.isEmpty()) {
-            return;
-        }
-
-        var settings = TemperedConfig.active().executioner();
-        if (!settings.enabled() || !settings.progressionEnabled()
-                || !Probability.succeeds(settings.progressChance(), player.getRandom()::nextDouble)) return;
-
-        ExecutionerData previous = ExecutionerService.getProgressData(weapon);
-        int previousLevel = previous == null ? 0 : ExecutionerRules.level(previous);
-        ExecutionerData updated = ExecutionerService.recordHostileKill(weapon);
-        if (settings.announceTierUp() && updated != null && ExecutionerRules.level(updated) > previousLevel) {
-            player.displayClientMessage(
-                    Component.translatable(
-                            "message.tempered.executioner.level_up",
-                            toRomanNumeral(ExecutionerRules.level(updated)),
-                            weapon.getHoverName()
-                    ),
-                    false
-            );
-        }
-    }
-
-    private static String toRomanNumeral(int level) {
-        return switch (level) {
-            case 1 -> "I";
-            case 2 -> "II";
-            case 3 -> "III";
-            default -> String.valueOf(level);
-        };
     }
 
     private ExecutionerCombatHandler() {

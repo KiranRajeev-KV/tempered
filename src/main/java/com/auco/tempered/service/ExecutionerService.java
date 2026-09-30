@@ -3,12 +3,14 @@ package com.auco.tempered.service;
 import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
 import com.auco.tempered.equipment.affix.executioner.ExecutionerRules;
 import com.auco.tempered.config.TemperedConfig;
+import com.auco.tempered.config.affix.ExecutionerSettings;
 import com.auco.tempered.registry.ModDataComponents;
 import com.auco.tempered.tag.ModEntityTypeTags;
 import com.auco.tempered.tag.ModItemTags;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.item.ItemStack;
@@ -18,11 +20,12 @@ public final class ExecutionerService {
 
     /**
      * Returns the attacking player's eligible main-hand weapon for a direct
-     * melee damage source. Projectiles and damage-over-time sources fail the
-     * identity check because their direct entity is not the player.
+     * player-attack damage source. Vanilla sweeping attacks use this same type;
+     * reflected damage and custom attributed sources must not count as melee.
      */
     public static ItemStack getDirectMeleeWeapon(DamageSource source) {
-        if (!(source.getEntity() instanceof ServerPlayer player)
+        if (!source.is(DamageTypes.PLAYER_ATTACK)
+                || !(source.getEntity() instanceof ServerPlayer player)
                 || source.getDirectEntity() != player) {
             return ItemStack.EMPTY;
         }
@@ -67,24 +70,25 @@ public final class ExecutionerService {
      * preserves history beyond the current top tier and saturates at the integer limit.
      */
     public static ExecutionerData recordHostileKill(ItemStack weapon) {
-        var settings = TemperedConfig.active().executioner();
+        ExecutionerProgressResult result = advanceProgress(weapon, TemperedConfig.active().executioner());
+        return result == null ? null : result.updated();
+    }
+
+    /** Applies one successful award using the settings captured for that death. */
+    public static ExecutionerProgressResult advanceProgress(ItemStack weapon, ExecutionerSettings settings) {
         if (!settings.enabled() || !settings.progressionEnabled() || !weapon.is(ModItemTags.EXECUTIONER_APPLICABLE)) {
             return null;
         }
 
         ExecutionerData current = weapon.get(ModDataComponents.EXECUTIONER_DATA.get());
-        if (current == null) {
-            ExecutionerData firstKill = new ExecutionerData(settings.advance(0));
-            weapon.set(ModDataComponents.EXECUTIONER_DATA.get(), firstKill);
-            return firstKill;
-        }
-        if (!current.isValid()) {
+        if (current != null && !current.isValid()) {
             return null;
         }
-        ExecutionerData updated = new ExecutionerData(settings.advance(current.hostileKills()));
-        if (updated.equals(current)) return current;
-        weapon.set(ModDataComponents.EXECUTIONER_DATA.get(), updated);
-        return updated;
+        int previous = current == null ? 0 : current.hostileKills();
+        ExecutionerData updated = new ExecutionerData(settings.advance(previous));
+        if (!updated.equals(current)) weapon.set(ModDataComponents.EXECUTIONER_DATA.get(), updated);
+        return new ExecutionerProgressResult(previous, updated,
+                settings.levelForKills(previous), settings.levelForKills(updated.hostileKills()));
     }
 
     /**

@@ -62,7 +62,8 @@ extend this tag without changing Java code.
 
 Executioner is earned by killing hostile enemies with a sword or axe. Only
 direct player melee kills count; projectiles, damage over time, environmental
-damage, and creative-mode kills do not. A qualifying hit that would leave a
+damage, reflected damage, and creative-mode kills do not by default. Sweeping
+kills and spawner mobs count. A qualifying hit that would leave a
 hostile enemy at or below the current threshold becomes lethal.
 
 | Tier | Total hostile kills | Execute threshold |
@@ -78,6 +79,13 @@ controlled by [`tempered:executioner_applicable`](src/main/resources/data/temper
 Datapacks can exempt special or scripted hostile mobs through the empty-by-default
 [`tempered:executioner_immune`](src/main/resources/data/tempered/tags/entity_type/executioner_immune.json)
 entity-type tag.
+
+Progress is awarded to the weapon captured at the death event, at the end of
+the server tick after all death listeners have finished. Canceled deaths and
+Totem survival grant no progress; duplicate notifications for a target within
+one tick produce at most one award. Switching weapons before the award does
+not transfer credit. Each successful award uses the configured progress amount
+and announces only the highest tier reached when it crosses multiple tiers.
 
 ## Configuration
 
@@ -126,6 +134,7 @@ Useful Gradle commands:
 ./gradlew runServer
 ./gradlew build
 ./gradlew test
+./gradlew runGameTestServer
 ./gradlew updateConfigExample
 ```
 
@@ -150,6 +159,13 @@ Whenever config keys, defaults, or explanations change, run
 `./gradlew updateConfigExample` and commit the updated reference. The test suite
 checks the reference against the registered specification, so stale examples
 fail the build.
+
+`build` runs both verification suites. `test` checks configuration and registered
+equipment data. `runGameTestServer`
+runs four focused gameplay scenarios in a real Minecraft world, covering combat
+attribution, cancellation, execution, smithing consumption, and saved equipment.
+These tests and their immunity-tag fixture live in `src/gameTest` and load only
+in that run; they are excluded from the distributed mod and normal play runs.
 
 ## Roadmap
 

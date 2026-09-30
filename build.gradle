@@ -41,9 +41,22 @@ base {
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+// Gameplay tests load only in their dedicated run, never in the distributed mod.
+sourceSets {
+    gameTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+configurations {
+    gameTestImplementation.extendsFrom implementation
+    gameTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
 neoForge {
     // Specify the version of NeoForge to use.
     version = project.neo_version
+    addModdingDependenciesTo(sourceSets.gameTest)
 
     parchment {
         mappingsVersion = project.parchment_mappings_version
@@ -67,11 +80,11 @@ neoForge {
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
+        // Launch a real world for the isolated progression test mod, then exit with its result.
         gameTestServer {
             type = "gameTestServer"
+            sourceSet = sourceSets.gameTest
+            gameDirectory = file('build/gameTestRun')
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
@@ -107,12 +120,19 @@ neoForge {
         "${mod_id}" {
             sourceSet(sourceSets.main)
         }
+        tempered_gametests {
+            sourceSet(sourceSets.gameTest)
+        }
     }
 
     unitTest {
         enable()
         testedMod = mods.tempered
     }
+    runs.configureEach {
+        loadedMods = [mods.tempered]
+    }
+    runs.gameTestServer.loadedMods = [mods.tempered, mods.tempered_gametests]
 }
 
 // Sets up a dependency configuration called 'localRuntime'.
@@ -206,6 +226,11 @@ tasks.named('test', Test).configure {
     useJUnitPlatform()
     systemProperty 'tempered.projectDir', project.projectDir.absolutePath
     inputs.file('config.toml.example')
+}
+
+// Keep gameplay regressions part of the normal build instead of an optional check.
+tasks.named('check').configure {
+    dependsOn tasks.named('runGameTestServer')
 }
 
 tasks.register('updateConfigExample', JavaExec) {

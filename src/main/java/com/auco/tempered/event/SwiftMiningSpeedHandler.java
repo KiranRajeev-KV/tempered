@@ -8,6 +8,7 @@ import com.auco.tempered.service.SwiftService;
 import net.minecraft.world.item.ItemStack;
 
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
@@ -15,7 +16,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 @EventBusSubscriber(modid = Tempered.MODID)
 public final class SwiftMiningSpeedHandler {
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
         ItemStack miningTool = event.getEntity().getMainHandItem();
         SwiftData swiftData = SwiftService.getActiveData(miningTool);

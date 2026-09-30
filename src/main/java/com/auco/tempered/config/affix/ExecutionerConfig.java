@@ -18,7 +18,7 @@ public final class ExecutionerConfig {
                 .define("kills_required_by_tier", ExecutionerSettings.DEFAULT.killsRequired(), value -> ConfigValues.numbers(value, 1, Integer.MAX_VALUE, true, true));
         health = key(builder, "execute_health_percent_by_tier", "Maximum-health execute threshold per tier, each 0-100 percent. Must match milestone list length.")
                 .define("execute_health_percent_by_tier", ExecutionerSettings.DEFAULT.healthPercents(), value -> ConfigValues.numbers(value, 0, 100, false, false));
-        progressChance = key(builder, "progress_chance", "Probability per qualifying melee kill: 0 never, 0.25 = 25%, 1 always.")
+        progressChance = key(builder, "progress_chance", "One roll per qualifying hostile melee death, including sweeping and spawner mobs: 0 never, 0.25 = 25%, 1 always. Canceled deaths grant no progress; awards commit at the end of the server tick.")
                 .defineInRange("progress_chance", 1.0, 0.0, 1.0);
         progressAmount = key(builder, "progress_per_success", "Progress awarded by a successful kill roll, 1-2147483647. Counter saturates safely.")
                 .defineInRange("progress_per_success", 1, 1, Integer.MAX_VALUE);

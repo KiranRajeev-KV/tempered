@@ -28,7 +28,7 @@ execute_chance_by_tier = [1.0, 1.0, 1.0]
 execute_health_percent_by_tier = [5.0, 10.0, 15.0]
 # Total progress required per tier: 1-100 strictly increasing integers, each 1-2147483647.
 kills_required_by_tier = [2, 5, 10]
-# Probability per qualifying melee kill: 0 never, 0.25 = 25%, 1 always.
+# One roll per qualifying hostile melee death, including sweeping and spawner mobs: 0 never, 0.25 = 25%, 1 always. Canceled deaths grant no progress; awards commit at the end of the server tick.
 #  Default: 1.0
 #  Range: 0.0 ~ 1.0
 progress_chance = 1.0
