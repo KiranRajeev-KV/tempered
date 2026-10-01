@@ -2,6 +2,7 @@ package com.auco.tempered.client.guide;
 
 import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 import com.auco.tempered.config.GameplaySettings;
 import com.auco.tempered.config.TemperedConfig;
 import com.auco.tempered.presentation.GuideSettingsContent;
@@ -25,9 +26,11 @@ public final class SettingsTagCompiler extends BlockTagCompiler {
     protected void compile(PageCompiler compiler, LytBlockContainer parent, MdxJsxElementFields element) {
         String id = element.getAttributeString("topic", "");
         var topic = Arrays.stream(GuideTopic.values()).filter(value -> value.id().equals(id)
-                && value != GuideTopic.OVERVIEW && value != GuideTopic.SMITHING).findFirst().orElse(null);
+                && value.hasSettings()).findFirst().orElse(null);
         if (topic == null) {
-            parent.appendError(compiler, "topic must be reinforced, swift, executioner or loot", element);
+            String supported = Arrays.stream(GuideTopic.values()).filter(GuideTopic::hasSettings)
+                    .map(GuideTopic::id).collect(Collectors.joining(", "));
+            parent.appendError(compiler, "topic must be " + supported, element);
             return;
         }
         // One snapshot for every settings tag in a page; no compiled-value cache across page visits.

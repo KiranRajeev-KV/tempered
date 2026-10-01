@@ -6,6 +6,7 @@ import com.auco.tempered.config.affix.ExecutionerConfig;
 import com.auco.tempered.config.affix.ExecutionerSettings;
 import com.auco.tempered.config.acquisition.AspectLootConfig;
 import com.auco.tempered.config.acquisition.AcquisitionSettings;
+import com.auco.tempered.config.equipment.EquipmentUpgradeConfig;
 import com.mojang.logging.LogUtils;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -27,15 +28,18 @@ public final class TemperedConfig {
     private final ExecutionerConfig executioner;
     private final AspectLootConfig reinforcedLoot;
     private final AspectLootConfig swiftLoot;
+    private final EquipmentUpgradeConfig upgrades;
 
     private TemperedConfig(ModConfigSpec.Builder builder) {
         builder.translation("tempered.config.aspects").push("aspects").pop();
         builder.translation("tempered.config.affixes").push("affixes").pop();
+        builder.translation("tempered.config.equipment").push("equipment").pop();
         reinforced = new ReinforcedConfig(builder);
         swift = new SwiftConfig(builder);
         executioner = new ExecutionerConfig(builder);
         reinforcedLoot = new AspectLootConfig(builder, "reinforced");
         swiftLoot = new AspectLootConfig(builder, "swift");
+        upgrades = new EquipmentUpgradeConfig(builder);
     }
 
     public static GameplaySettings active() { return active; }
@@ -51,7 +55,7 @@ public final class TemperedConfig {
             executionerSettings = ExecutionerSettings.DEFAULT;
         }
         activate(new GameplaySettings(CONFIG.reinforced.read(), CONFIG.swift.read(), executionerSettings,
-                new AcquisitionSettings(CONFIG.reinforcedLoot.read(), CONFIG.swiftLoot.read())));
+                new AcquisitionSettings(CONFIG.reinforcedLoot.read(), CONFIG.swiftLoot.read()), CONFIG.upgrades.read()));
     }
 
 }

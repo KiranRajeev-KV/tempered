@@ -1,5 +1,6 @@
 package com.auco.tempered.service;
 
+import java.util.Optional;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedRules;
 import com.auco.tempered.config.TemperedConfig;
@@ -7,6 +8,7 @@ import com.auco.tempered.config.aspect.ReinforcedSettings;
 import com.auco.tempered.registry.ModDataComponents;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -108,7 +110,9 @@ public final class ReinforcementService {
         // it does not change every instance of the underlying Item type.
         targetStack.set(
                 ModDataComponents.REINFORCED_DATA.get(),
-                new ReinforcedData(result.newLevel(), baseMaxDamage)
+                new ReinforcedData(result.newLevel(), baseMaxDamage, currentData == null
+                        ? Optional.of(BuiltInRegistries.ITEM.getKey(targetStack.getItem()))
+                        : currentData.baselineItem())
         );
         // A nonlinear configuration can reduce durability at the next level.
         int damage = targetStack.getDamageValue();

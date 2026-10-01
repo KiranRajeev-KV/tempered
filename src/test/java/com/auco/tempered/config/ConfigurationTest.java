@@ -37,9 +37,11 @@ class ConfigurationTest {
         var parsed = new TomlParser().parse(ConfigExample.render());
         parsed.set("aspects.swift.mining_speed_bonus_percent_by_level", List.of(8, -1, 24));
         parsed.set("affixes.executioner.kills_required_by_tier", List.of(10, 2, 5));
+        parsed.set("equipment.upgrades.damage_policy", "typo");
         TemperedConfig.SPEC.correct(parsed);
         assertEquals(SwiftSettings.DEFAULT.bonuses(), parsed.get("aspects.swift.mining_speed_bonus_percent_by_level"));
         assertEquals(ExecutionerSettings.DEFAULT.killsRequired(), parsed.get("affixes.executioner.kills_required_by_tier"));
+        assertEquals("remaining_fraction", parsed.get("equipment.upgrades.damage_policy"));
         assertFalse(ConfigValues.numbers(List.of(Double.NaN), 0, 1, false, false));
         assertFalse(ConfigValues.numbers(List.of(1.5), 1, 100, true, true));
         parsed.set("acquisition.reinforced.loot_tables", List.of("minecraft:chests/Bad ID"));

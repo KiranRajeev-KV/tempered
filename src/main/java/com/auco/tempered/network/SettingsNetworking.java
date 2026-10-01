@@ -10,7 +10,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public final class SettingsNetworking {
     @SubscribeEvent
     public static void register(RegisterPayloadHandlersEvent event) {
-        event.registrar("2").playToClient(ActiveSettingsPayload.TYPE, ActiveSettingsPayload.STREAM_CODEC,
+        event.registrar("3").playToClient(ActiveSettingsPayload.TYPE, ActiveSettingsPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> TemperedConfig.activate(payload.settings())));
     }
     private SettingsNetworking() {}

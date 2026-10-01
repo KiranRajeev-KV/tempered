@@ -26,6 +26,8 @@ public final class ConfigExample {
                 # Mismatched Executioner tier-list lengths use the entire default Executioner section.
                 # Saved levels/progress survive disabling or lowering caps; effective bonuses use the new cap.
                 # Reinforced equipment recalculates when carried/used, retaining its remaining durability fraction.
+                # Material smithing upgrades retain base-item history and rebase Reinforced to the destination durability.
+                # Two-item crafting repair is blocked for equipment with Tempered history; use an anvil.
                 # Executioner continues recording progress beyond the current highest tier (integer saturation).
                 # Aspects always apply successfully; no application chance or random smithing preview is used.
                 # Eligibility remains controlled by datapacks; Aspect acquisition uses the sections below.

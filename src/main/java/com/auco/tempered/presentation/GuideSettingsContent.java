@@ -31,7 +31,8 @@ public final class GuideSettingsContent {
                 addLoot(lines, GuideTopic.REINFORCED, settings.reinforced().enabled(), settings.acquisition().reinforced());
                 addLoot(lines, GuideTopic.SWIFT, settings.swift().enabled(), settings.acquisition().swift());
             }
-            case OVERVIEW, SMITHING -> throw new IllegalArgumentException("Topic has no configured section: " + topic);
+            case MAINTENANCE -> lines.add(text("maintenance.damage." + settings.upgrades().damagePolicy().id()));
+            case OVERVIEW, SMITHING, CONFIGURATION -> throw new IllegalArgumentException("Topic has no configured section: " + topic);
         }
         return List.copyOf(lines);
     }

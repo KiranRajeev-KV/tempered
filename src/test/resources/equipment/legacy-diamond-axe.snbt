@@ -1,0 +1,11 @@
+{
+    id: "minecraft:diamond_axe",
+    count: 1,
+    components: {
+        "tempered:reinforced_data": {level: 12, base_max_damage: 1561},
+        "tempered:swift_data": 12,
+        "tempered:executioner_data": 10000,
+        "minecraft:max_damage": 2342,
+        "minecraft:damage": 1171
+    }
+}

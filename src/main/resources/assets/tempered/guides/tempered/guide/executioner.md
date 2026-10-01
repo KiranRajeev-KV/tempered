@@ -7,42 +7,47 @@ navigation:
 ---
 # Executioner
 
-Executioner is an **earned Affix**. Use a compatible weapon, usually a sword
-or axe, to kill eligible hostile mobs. Progress belongs to that weapon.
-There is no Executioner Aspect or crafting recipe.
+Earn **Executioner** by killing eligible hostile mobs with a compatible weapon,
+usually a sword or axe. Progress belongs to the weapon. There is no
+Executioner Aspect or crafting recipe.
 
-## Earning progress
+Fresh compatible weapons show awakening in their tooltip. Hold **Shift** to
+check earned progress and the next milestone.
 
-Direct player **melee kills** on eligible hostile mobs grant progress.
-**Sweeping kills and spawner mobs count.** Projectiles, damage over time,
-environmental and reflected damage do not count. The server's datapacks can
-change weapon compatibility and exempt hostile mobs.
+## Which kills count?
 
-The configured section below tells you whether creative-mode kills count,
-whether progression is paused, and the chance and amount of each progress award.
-With guaranteed one-point awards, progress is measured in **hostile kills**.
-Other configurations use **progress points**.
+Direct player **melee kills** count, including **sweeping kills and spawner mobs**.
+Projectiles, damage over time, environmental and reflected damage do not.
+Switching weapons after a kill does not transfer its credit.
 
-## Executing a target
+The server controls the award chance and amount, whether creative kills count,
+and whether progression is paused. Guaranteed one-point awards display
+**hostile kills**; other settings display **progress points**.
 
-After unlocking a tier, a qualifying melee hit can become lethal if it would
-leave an eligible hostile mob alive **at or below the tier's health threshold**.
-Each tier has its own execute chance. A zero threshold or zero execute chance
-means execution is unavailable at that tier.
-
-The threshold uses the target's current maximum health. Absorption is accounted
-for; a fully absorbed hit does not execute. Vanilla bosses are eligible unless
-exempted by datapacks.
-
-**Totems can save the target normally.** Totem survival and canceled deaths
-grant no progress. Normal loot and death credit are preserved.
-
-## Configured progression and tiers
+## Active progression and tiers
 
 <tempered:Settings topic="executioner" />
 
-## Keeping your history
+## What does execution do?
 
-Saved progress is retained when balance changes. History keeps growing past
-the highest tier, up to the counter's limit. Disabled effects do not erase it.
-Pausing progression does not disable an already-earned execution effect.
+After unlocking a tier, a qualifying melee hit can become lethal if it would
+leave an eligible hostile mob alive **at or below that tier's health threshold**.
+Each tier has its own execute chance. A zero threshold or chance means execution
+is unavailable at that tier. Naturally lethal hits need no execution roll.
+
+The threshold uses the target's current maximum health. Absorption is accounted
+for; a fully absorbed hit does not execute. Vanilla bosses are eligible unless
+the server's datapacks exempt them.
+
+**Totems can save targets normally.** Totem survival and canceled deaths grant
+no progress. Normal loot and death credit are preserved.
+
+## Keeping your progress
+
+[Material upgrades and anvil work](maintenance.md) retain the base weapon's
+progress. History continues past the highest tier until the counter's limit.
+Disabled effects and incompatible weapons retain it.
+
+Pausing progression keeps already-earned execution effects. Changing the
+configured award amount affects future kills and does not rescale earned
+history. See [server configuration](configuration.md).

@@ -7,6 +7,8 @@
 # Mismatched Executioner tier-list lengths use the entire default Executioner section.
 # Saved levels/progress survive disabling or lowering caps; effective bonuses use the new cap.
 # Reinforced equipment recalculates when carried/used, retaining its remaining durability fraction.
+# Material smithing upgrades retain base-item history and rebase Reinforced to the destination durability.
+# Two-item crafting repair is blocked for equipment with Tempered history; use an anvil.
 # Executioner continues recording progress beyond the current highest tier (integer saturation).
 # Aspects always apply successfully; no application chance or random smithing preview is used.
 # Eligibility remains controlled by datapacks; Aspect acquisition uses the sections below.
@@ -88,3 +90,10 @@ enabled = true
 enabled = true
 # Total bonus percent at each level (not cumulative). 1-100 entries, each 0-10000. List length is the level cap.
 mining_speed_bonus_percent_by_level = [8.0, 16.0, 24.0, 32.0, 40.0]
+
+[equipment.upgrades]
+# Wear carried through material-changing smithing for equipment with Tempered history.
+# Allowed: remaining_fraction (default) keeps the percentage of durability remaining; damage_points keeps the same damage points.
+# Both clamp safely so the upgrade never breaks the result.
+# Does not change Aspect application or balance reconciliation. Requires world/server restart.
+damage_policy = "remaining_fraction"

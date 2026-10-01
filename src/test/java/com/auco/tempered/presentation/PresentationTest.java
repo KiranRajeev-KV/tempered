@@ -128,7 +128,7 @@ class PresentationTest {
                             List.of(0.0, 0.375), true, false), acquisition);
 
             for (GuideTopic topic : GuideTopic.values()) {
-                if (topic != GuideTopic.OVERVIEW && topic != GuideTopic.SMITHING) {
+                if (topic.hasSettings()) {
                     render(GuideSettingsContent.build(topic, settings)); // Every nested translation must exist.
                 }
             }

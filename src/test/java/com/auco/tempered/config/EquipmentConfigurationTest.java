@@ -9,6 +9,7 @@ import com.auco.tempered.config.acquisition.AspectLootSettings;
 import com.auco.tempered.config.aspect.ReinforcedSettings;
 import com.auco.tempered.config.aspect.SwiftSettings;
 import com.auco.tempered.config.affix.ExecutionerSettings;
+import com.auco.tempered.config.equipment.EquipmentUpgradeSettings;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
 import com.auco.tempered.equipment.affix.executioner.ExecutionerData;
 import com.auco.tempered.network.ActiveSettingsPayload;
@@ -50,24 +51,30 @@ class EquipmentConfigurationTest {
             String minKey = "acquisition.reinforced.min_count";
             String maxKey = "acquisition.reinforced.max_count";
             String chanceKey = "acquisition.reinforced.chance";
+            String policyKey = "equipment.upgrades.damage_policy";
             Object previousMin = raw.get(minKey);
             Object previousMax = raw.get(maxKey);
             Object previousChance = raw.get(chanceKey);
+            Object previousPolicy = raw.get(policyKey);
             ModConfigSpec.ConfigValue<?> minValue = TemperedConfig.SPEC.getValues().get(minKey);
             ModConfigSpec.ConfigValue<?> maxValue = TemperedConfig.SPEC.getValues().get(maxKey);
             ModConfigSpec.ConfigValue<?> chanceValue = TemperedConfig.SPEC.getValues().get(chanceKey);
+            ModConfigSpec.ConfigValue<?> policyValue = TemperedConfig.SPEC.getValues().get(policyKey);
             try {
                 raw.set(key, List.of(64, 192));
                 raw.set(minKey, 5);
                 raw.set(maxKey, 2);
                 raw.set(chanceKey, 1); // Integer TOML probabilities are accepted too.
+                raw.set(policyKey, "damage_points");
                 // Model the cleared cache at the next world load, without saving edits to disk.
                 value.clearCache();
                 minValue.clearCache();
                 maxValue.clearCache();
                 chanceValue.clearCache();
+                policyValue.clearCache();
                 ConfigLifecycle.onLoading(new ModConfigEvent.Loading(config));
                 assertEquals(ExecutionerSettings.DEFAULT, TemperedConfig.active().executioner());
+                assertEquals(EquipmentUpgradeSettings.DamagePolicy.DAMAGE_POINTS, TemperedConfig.active().upgrades().damagePolicy());
                 var loot = TemperedConfig.active().acquisition().reinforced();
                 assertEquals(1, loot.minCount());
                 assertEquals(1, loot.maxCount());
@@ -79,10 +86,12 @@ class EquipmentConfigurationTest {
                 raw.set(minKey, previousMin);
                 raw.set(maxKey, previousMax);
                 raw.set(chanceKey, previousChance);
+                raw.set(policyKey, previousPolicy);
                 value.clearCache();
                 minValue.clearCache();
                 maxValue.clearCache();
                 chanceValue.clearCache();
+                policyValue.clearCache();
                 TemperedConfig.activate(before);
             }
         }).get();
@@ -98,7 +107,8 @@ class EquipmentConfigurationTest {
                             0.25, 3, List.of(0.1, 0.75), true, false),
                     new AcquisitionSettings(new AspectLootSettings(false, 0.5, 2, 7,
                             Set.of(ResourceLocation.parse("othermod:chests/ruins"))),
-                            new AspectLootSettings(true, 0, 1, 16, Set.of())));
+                            new AspectLootSettings(true, 0, 1, 16, Set.of())),
+                    new EquipmentUpgradeSettings(EquipmentUpgradeSettings.DamagePolicy.DAMAGE_POINTS));
             var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), server.registryAccess());
             try {
                 ActiveSettingsPayload.STREAM_CODEC.encode(buffer, new ActiveSettingsPayload(settings));

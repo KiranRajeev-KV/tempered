@@ -11,24 +11,33 @@ item_ids:
 
 <ItemImage id="tempered:reinforced_aspect" float="left" />
 
-The Reinforced Aspect increases **maximum durability**. It accepts any item
-with durability, including tools, weapons, armor, shields and compatible
-modded equipment. [Find it as loot](loot.md), then [apply it at smithing](smithing.md).
+Increase **maximum durability** on tools, weapons, armor, shields or any other
+item with durability. [Find an Aspect](loot.md), then
+[apply it at a smithing table](smithing.md).
 
-## How the bonus works
-
-The first application records the item's original maximum durability. Every
-later level uses that same baseline, so repeated upgrades do not compound the
-bonus. Listed bonuses are **totals at each level**, not extra bonuses per application.
-
-Reinforced does not fully repair the item. When server balance changes, carried
-equipment is reconciled while preserving its remaining durability fraction.
-Stored equipment is reconciled when brought into use.
-
-## Configured levels
+## Active levels
 
 <tempered:Settings topic="reinforced" />
 
-Saved levels above a lowered cap are retained; the active bonus uses the cap.
-Disabling Reinforced keeps that history. Raising the cap or re-enabling the
-mechanic makes it available again.
+## How durability is calculated
+
+The first application records the item's durability before Reinforced.
+Later Aspect levels use that same baseline, so bonuses do not compound.
+A listed bonus is the **total at that level**, not an extra bonus per application.
+
+A [material upgrade](maintenance.md), such as diamond to netherite, keeps the
+saved level and uses the new equipment's durability for the bonus. Applying
+another Aspect afterward uses that new baseline.
+
+## When balance changes
+
+Disabling Reinforced or lowering its cap keeps your saved levels. The active
+bonus uses the current cap; re-enabling the effect or raising the cap makes
+retained history available again.
+
+Carried equipment updates its durability while keeping the remaining
+percentage. Stored equipment updates when brought into use. Older equipment
+with an uncertain original durability keeps its recorded baseline until a
+supported material upgrade establishes a new one.
+
+See [server configuration](configuration.md) to tune these rules.

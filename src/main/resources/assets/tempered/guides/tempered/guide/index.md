@@ -6,33 +6,35 @@ navigation:
 ---
 # Tempered
 
-Improve the equipment you already use. **Aspects** are consumable loot items
-that add chosen Attributes at a smithing table. **Affixes** are abilities earned
-by using equipment: Executioner grows through eligible hostile melee kills.
+Improve the equipment you already use. Looted **Aspects** add chosen upgrades
+called Attributes. **Affixes**, such as Executioner, are earned by using equipment.
 
-## Start here
+## Your first upgrade
 
-1. [Find Aspects](loot.md) while exploring.
-2. [Apply an Aspect](smithing.md) to compatible equipment.
-3. Keep using your weapons to awaken [Executioner](executioner.md).
+1. [Find an Aspect](loot.md) while exploring.
+2. [Apply it at a smithing table](smithing.md) to compatible equipment.
+3. Use a sword or axe against hostile mobs to earn [Executioner](executioner.md).
+4. [Upgrade and repair your equipment](maintenance.md) while keeping its progress.
+
+<Row>
+  <ItemLink id="tempered:reinforced_aspect" />
+  <ItemLink id="tempered:swift_aspect" />
+</Row>
+
+## Find help while playing
+
+Hold **Shift** over equipment or an Aspect for details and upgrade status.
+Hold GuideME's **Open Guide** key (**G** by default) over an Aspect to jump to
+its page. You can change that key in Minecraft's Controls.
+
+Run `/tempered guide` to reopen this guide at any time, with cheats enabled or
+disabled. Add a topic to jump directly, such as `/tempered guide maintenance`
+or `/tempered guide configuration`. Use the sidebar or search to find a rule.
+
+## Guide pages
 
 <SubPages icons={true} />
 
-## Reading your equipment
-
-Hold **Shift** over an Aspect or equipment to see its details, upgrade status,
-and configured limits. Fresh compatible weapons show Executioner awakening
-before the first kill; upgraded equipment shows active bonuses and progress.
-
-Hold GuideME's **Open Guide** key (G by default) over
-<ItemLink id="tempered:reinforced_aspect" /> or
-<ItemLink id="tempered:swift_aspect" /> to jump to that Aspect's page.
-You can also open this guide with `/tempered guide`; add a topic name to jump
-directly, for example `/tempered guide executioner`.
-
-## Your server's rules
-
-The configured sections use this server's **active settings**. Bonuses, caps,
-chances, quantities and loot sources can differ between servers. Configuration
-changes require a world/server restart; reopen a page after joining to see its
-current balance. Settings shown here do not change your equipment.
+Bonuses and chances shown in configured sections use the **server's active
+settings**. Different servers may have different rules. Revisit a page after
+joining or changing worlds to see its current values.

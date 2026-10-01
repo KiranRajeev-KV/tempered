@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 import com.auco.tempered.config.GameplaySettings;
 import com.auco.tempered.config.TemperedConfig;
 import com.auco.tempered.config.aspect.ReinforcedSettings;
+import com.auco.tempered.config.equipment.EquipmentUpgradeSettings;
 import com.auco.tempered.presentation.GuideTopic;
 import guideme.compiler.PageCompiler;
 import guideme.compiler.ParsedGuidePage;
@@ -38,6 +39,13 @@ class GuideIntegrationTest {
                 }
                 var links = Pattern.compile("\\]\\(([^)]+\\.md)\\)").matcher(source);
                 while (links.find()) assertNotNull(pageSource(links.group(1)), "Broken link in " + topic);
+                var settingsTags = Pattern.compile("<tempered:Settings topic=\"([^\"]+)\"\\s*/>").matcher(source);
+                while (settingsTags.find()) {
+                    String id = settingsTags.group(1);
+                    assertTrue(java.util.Arrays.stream(GuideTopic.values())
+                            .anyMatch(candidate -> candidate.hasSettings() && candidate.id().equals(id)),
+                            "Invalid configured topic in " + topic + ": " + id);
+                }
                 // Parse errors are rendered as an error heading by GuideME instead of thrown.
                 var heading = parsed.getAstRoot().children().stream()
                         .filter(guideme.libs.mdast.model.MdAstHeading.class::isInstance)
@@ -68,6 +76,16 @@ class GuideIntegrationTest {
                 assertEquals(GameplaySettings.DEFAULT.reinforced().maxLevel() + 1,
                         revisited.getBlocks().getFirst().getChildren().size());
                 assertEquals(101, first.getBlocks().getFirst().getChildren().size(), "Captured page must not mutate");
+                var wearSection = PageCompiler.parse("tempered", "en_us", section.getId(),
+                        "<tempered:Settings topic=\"maintenance\" />");
+                var fractionalWear = PageCompiler.compile(guide, guide.getExtensions(), wearSection).document();
+                String originalWear = fractionalWear.getTextContent();
+                var defaults = GameplaySettings.DEFAULT;
+                TemperedConfig.activate(new GameplaySettings(defaults.reinforced(), defaults.swift(), defaults.executioner(),
+                        defaults.acquisition(), new EquipmentUpgradeSettings(EquipmentUpgradeSettings.DamagePolicy.DAMAGE_POINTS)));
+                var pointsWear = PageCompiler.compile(guide, guide.getExtensions(), wearSection).document();
+                assertNotEquals(originalWear, pointsWear.getTextContent(), "Revisited maintenance page must reflect the server policy");
+                assertEquals(originalWear, fractionalWear.getTextContent(), "An already compiled page keeps its snapshot");
                 var invalid = PageCompiler.parse("tempered", "en_us", section.getId(), "<tempered:Settings topic=\"unknown\" />");
                 assertTrue(PageCompiler.compile(guide, guide.getExtensions(), invalid).document().getTextContent()
                         .contains("topic must be reinforced"));

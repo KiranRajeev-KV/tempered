@@ -11,6 +11,7 @@ import com.auco.tempered.config.GameplaySettings;
 import com.auco.tempered.config.aspect.ReinforcedSettings;
 import com.auco.tempered.config.aspect.SwiftSettings;
 import com.auco.tempered.config.affix.ExecutionerSettings;
+import com.auco.tempered.config.equipment.EquipmentUpgradeSettings;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -45,6 +46,7 @@ public record ActiveSettingsPayload(GameplaySettings settings) implements Custom
         buffer.writeBoolean(executioner.announceTierUp());
         writeLoot(buffer, settings.acquisition().reinforced());
         writeLoot(buffer, settings.acquisition().swift());
+        buffer.writeUtf(settings.upgrades().damagePolicy().id(), 32);
     }
 
     private static GameplaySettings read(RegistryFriendlyByteBuf buffer) {
@@ -58,7 +60,16 @@ public record ActiveSettingsPayload(GameplaySettings settings) implements Custom
         var executioner = new ExecutionerSettings(enabled, progression, kills, readDoubles(buffer),
                 buffer.readDouble(), buffer.readVarInt(), readDoubles(buffer), buffer.readBoolean(), buffer.readBoolean());
         return new GameplaySettings(reinforced, swift, executioner,
-                new AcquisitionSettings(readLoot(buffer), readLoot(buffer)));
+                new AcquisitionSettings(readLoot(buffer), readLoot(buffer)), readUpgrades(buffer));
+    }
+
+    private static EquipmentUpgradeSettings readUpgrades(RegistryFriendlyByteBuf buffer) {
+        String id = buffer.readUtf(32);
+        try {
+            return new EquipmentUpgradeSettings(EquipmentUpgradeSettings.DamagePolicy.fromId(id));
+        } catch (IllegalArgumentException exception) {
+            throw new DecoderException(exception.getMessage(), exception);
+        }
     }
 
     private static void writeLoot(RegistryFriendlyByteBuf buffer, AspectLootSettings settings) {
