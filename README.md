@@ -108,6 +108,30 @@ one tick produce at most one award. Switching weapons before the award does
 not transfer credit. Each successful award uses the configured progress amount
 and announces only the highest tier reached when it crosses multiple tiers.
 
+## Learning the system in game
+
+Aspect tooltips explain their purpose and smithing use. Hold **Shift** over
+an Aspect or equipment for details, including upgrade eligibility and caps.
+Fresh compatible weapons introduce Executioner before the first kill; upgraded
+equipment shows active bonuses, progress and retained history when balance changes.
+
+Use **`/tempered guide`** to open the GuideME GUI covering smithing, Reinforced,
+Swift, Executioner and loot. For example, `/tempered guide executioner` explains
+qualifying kills and current milestones; `/tempered guide loot` lists configured
+sources, chances and quantities. The guide provides a navigation sidebar,
+search, cross-links and scrolling. Hold GuideME's **Open Guide** key (**G** by
+default) over either Aspect to open its page. The command works with cheats disabled.
+
+**GuideME 21.1.19 or a newer 21.1 release is required**, installed alongside
+Tempered on clients and servers. It is downloaded automatically for development
+runs; it is not bundled into Tempered's jar. Use the Minecraft **1.21.1 NeoForge**
+build from [GuideME](https://www.curseforge.com/minecraft/mc-mods/guideme).
+
+Explanations use the server's active settings. Custom progress awards use
+progress-point units; disabled effects, paused progression and unavailable loot
+acquisition are identified. See [the in-game guide documentation](docs/in-game-guide.md)
+for behavior and maintenance details.
+
 ## Configuration
 
 All gameplay settings live in **`config/tempered/config.toml`**, generated when
@@ -176,6 +200,9 @@ The source is organized by responsibility:
 - `service` validates and applies changes to equipment.
 - `network` synchronizes active settings when players join.
 - `loot` adds configured Aspect rewards through NeoForge Global Loot Modifiers.
+- `presentation` builds read-only tooltips and configured guide rows from active settings.
+- `client/guide` registers GuideME, adapts configured rows through a custom tag, and opens the GUI.
+- `assets/tempered/guides/tempered/guide` contains searchable Markdown pages and navigation.
 - `recipe/aspect` connects those rules to the smithing-table recipe.
 - `event` contains tooltip, mining-speed, and affix combat event handling.
 - `registry` owns NeoForge registrations.
@@ -186,9 +213,10 @@ Whenever config keys, defaults, or explanations change, run
 checks the reference against the registered specification, so stale examples
 fail the build.
 
-`build` runs both verification suites. `test` checks configuration and registered
-equipment data. `runGameTestServer`
-runs six focused gameplay scenarios in a real Minecraft world, covering combat
+`build` runs both verification suites. `test` checks configuration, registered
+equipment data, two focused presentation scenarios and one GuideME integration
+scenario. `runGameTestServer` runs six focused gameplay scenarios in a real
+Minecraft world, covering combat
 attribution, cancellation, execution, smithing consumption, saved equipment,
 Aspect loot generation, and container reopening.
 These tests and their immunity-tag fixture live in `src/gameTest` and load only

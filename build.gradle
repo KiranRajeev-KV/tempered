@@ -28,6 +28,7 @@ sourceSets.main.resources {
 }
 
 repositories {
+    mavenCentral()
     // Add here additional repositories if required by some of the dependencies below.
     maven {
         url = "https://maven.blamejared.com/"
@@ -144,6 +145,9 @@ configurations {
 }
 
 dependencies {
+    compileOnly "org.appliedenergistics:guideme:${guideme_version}:api"
+    runtimeOnly "org.appliedenergistics:guideme:${guideme_version}"
+    testImplementation "org.appliedenergistics:guideme:${guideme_version}:api"
     testImplementation platform("org.junit:junit-bom:5.11.4")
     testImplementation "org.junit.jupiter:junit-jupiter"
     testImplementation "net.neoforged:testframework:${neo_version}"
@@ -183,6 +187,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             mod_name               : mod_name,
             mod_license            : mod_license,
             mod_version            : mod_version,
+            guideme_version        : guideme_version,
     ]
     inputs.properties replaceProperties
     expand replaceProperties

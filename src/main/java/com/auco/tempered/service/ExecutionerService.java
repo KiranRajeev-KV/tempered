@@ -31,9 +31,13 @@ public final class ExecutionerService {
         }
 
         ItemStack weapon = player.getMainHandItem();
-        return weapon.is(ModItemTags.EXECUTIONER_APPLICABLE)
+        return isApplicableWeapon(weapon)
                 ? weapon
                 : ItemStack.EMPTY;
+    }
+
+    public static boolean isApplicableWeapon(ItemStack stack) {
+        return stack.is(ModItemTags.EXECUTIONER_APPLICABLE);
     }
 
     public static boolean isHostileTarget(LivingEntity target) {
@@ -51,7 +55,7 @@ public final class ExecutionerService {
 
     /** Returns valid progression data, including progress before Tier I. */
     public static ExecutionerData getProgressData(ItemStack stack) {
-        if (!TemperedConfig.active().executioner().enabled() || !stack.is(ModItemTags.EXECUTIONER_APPLICABLE)) {
+        if (!TemperedConfig.active().executioner().enabled() || !isApplicableWeapon(stack)) {
             return null;
         }
 
@@ -76,7 +80,7 @@ public final class ExecutionerService {
 
     /** Applies one successful award using the settings captured for that death. */
     public static ExecutionerProgressResult advanceProgress(ItemStack weapon, ExecutionerSettings settings) {
-        if (!settings.enabled() || !settings.progressionEnabled() || !weapon.is(ModItemTags.EXECUTIONER_APPLICABLE)) {
+        if (!settings.enabled() || !settings.progressionEnabled() || !isApplicableWeapon(weapon)) {
             return null;
         }
 

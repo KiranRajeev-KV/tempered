@@ -3,6 +3,7 @@ package com.auco.tempered.service;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedData;
 import com.auco.tempered.equipment.attribute.reinforced.ReinforcedRules;
 import com.auco.tempered.config.TemperedConfig;
+import com.auco.tempered.config.aspect.ReinforcedSettings;
 import com.auco.tempered.registry.ModDataComponents;
 
 import net.minecraft.core.component.DataComponents;
@@ -21,13 +22,18 @@ public final class ReinforcementService {
     }
 
     public static ReinforcementResult inspect(ItemStack targetStack) {
-        if (!TemperedConfig.active().reinforced().enabled()) {
+        return inspect(targetStack, TemperedConfig.active().reinforced());
+    }
+
+    /** Reads one captured settings snapshot without changing the target. */
+    public static ReinforcementResult inspect(ItemStack targetStack, ReinforcedSettings settings) {
+        if (!settings.enabled()) {
             return new ReinforcementResult(ReinforcementResult.Status.DISABLED, 0, 0, 0, 0);
         }
         // "All equipment" currently means every item with a durability bar.
         // This naturally includes vanilla tools, weapons, armor, shields, and
         // other damageable equipment without maintaining a large item list.
-        if (!targetStack.isDamageableItem()) {
+        if (!isApplicable(targetStack)) {
             return new ReinforcementResult(
                     ReinforcementResult.Status.NOT_DAMAGEABLE,
                     0,
@@ -45,7 +51,7 @@ public final class ReinforcementService {
         if (currentData == null) {
             // No component means this is the first application. Capture the
             // current maximum as the permanent baseline for all later levels.
-            return successfulResult(0, targetStack.getMaxDamage(), currentMaxDamage);
+            return successfulResult(0, targetStack.getMaxDamage(), currentMaxDamage, settings);
         }
 
         if (!currentData.isValid()) {
@@ -58,7 +64,7 @@ public final class ReinforcementService {
             );
         }
 
-        if (currentData.level() >= TemperedConfig.active().reinforced().maxLevel()) {
+        if (currentData.level() >= settings.maxLevel()) {
             return new ReinforcementResult(
                     ReinforcementResult.Status.MAX_LEVEL,
                     currentData.level(),
@@ -71,8 +77,13 @@ public final class ReinforcementService {
         return successfulResult(
                 currentData.level(),
                 currentData.baseMaxDamage(),
-                currentMaxDamage
+                currentMaxDamage,
+                settings
         );
+    }
+
+    public static boolean isApplicable(ItemStack stack) {
+        return stack.isDamageableItem();
     }
 
     public static ReinforcementResult apply(ItemStack targetStack) {
@@ -113,7 +124,8 @@ public final class ReinforcementService {
     private static ReinforcementResult successfulResult(
             int currentLevel,
             int baseMaxDamage,
-            int currentMaxDamage
+            int currentMaxDamage,
+            ReinforcedSettings settings
     ) {
         int newLevel = currentLevel + 1;
         return new ReinforcementResult(
@@ -121,7 +133,7 @@ public final class ReinforcementService {
                 currentLevel,
                 newLevel,
                 currentMaxDamage,
-                ReinforcedRules.maxDamage(baseMaxDamage, newLevel, TemperedConfig.active().reinforced())
+                ReinforcedRules.maxDamage(baseMaxDamage, newLevel, settings)
         );
     }
 

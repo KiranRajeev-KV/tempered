@@ -88,6 +88,14 @@ Tempered expands vanilla equipment with a progression system built around Attrib
     ordering="NONE"
     side="BOTH"
 
+[[dependencies.${mod_id}]]
+    modId="guideme"
+    type="required"
+    reason="Provides Tempered's in-game guide."
+    versionRange="[${guideme_version},21.2)"
+    ordering="AFTER"
+    side="BOTH"
+
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.

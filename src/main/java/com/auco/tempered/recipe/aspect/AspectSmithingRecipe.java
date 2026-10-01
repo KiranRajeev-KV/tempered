@@ -74,7 +74,7 @@ public final class AspectSmithingRecipe implements SmithingRecipe {
 
     @Override
     public boolean isBaseIngredient(ItemStack stack) {
-        return stack.isDamageableItem() || stack.is(com.auco.tempered.tag.ModItemTags.SWIFT_APPLICABLE);
+        return ReinforcementService.isApplicable(stack) || SwiftService.isApplicable(stack);
     }
 
     @Override
