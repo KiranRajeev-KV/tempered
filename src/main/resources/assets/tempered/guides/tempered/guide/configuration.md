@@ -104,3 +104,19 @@ Datapacks control eligible Swift tools with `tempered:swift_applicable`,
 Executioner weapons with `tempered:executioner_applicable`, and exempt hostile
 mobs with `tempered:executioner_immune`. Eligibility and immunity use tags;
 gameplay balance and acquisition source lists use the TOML file.
+
+## Custom chest appearance
+
+Your local `config/tempered/client.toml` contains a separate visual option:
+
+```toml
+[rendering]
+custom_chests = false
+```
+
+Set it to `true` to use the treasure chest model for ordinary single and double
+chests, including inventory and held items. Set it to `false` to restore the
+usual appearance. The default is off. Trapped and Ender chests are unaffected.
+You can also change it through **Mods → Tempered → Config → client.toml**;
+changes apply immediately. This is a personal preference and does not change
+the server's settings or other players' chest appearance.

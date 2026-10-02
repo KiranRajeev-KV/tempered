@@ -21,6 +21,20 @@ complete scenarios covering real regressions over tests of trivial helpers.
 The development-only equipment overlay shows held-item progression, mining
 speed and aimed-target execute eligibility. Production builds disable it.
 
+The optional treasure chest renderer is controlled by
+`rendering.custom_chests` in `config/tempered/client.toml`, defaulting to `false`.
+It works in development and production clients. With it enabled, single and
+double chests use the exported cuboid geometry and pixel atlas, and the lid
+follows vanilla opening animation. The inventory and held item use the same
+renderer. Trapped and Ender chests retain their usual appearance. Changes apply
+immediately through the Mods configuration screen or a reloaded config file.
+Run `./gradlew runClient` and enable the option to test normal chests.
+The editable Blockbench project is
+`src/main/resources/assets/tempered/models/preview/treasure_chest.bbmodel`;
+its atlas is `assets/tempered/textures/entity/treasure_chest.png`. The build
+excludes `.bbmodel` source files. Edits to the Blockbench project must also be
+exported to the renderer's `models/preview/treasure_chest.json` geometry.
+
 ## Responsibilities
 
 | Source | Responsibility |

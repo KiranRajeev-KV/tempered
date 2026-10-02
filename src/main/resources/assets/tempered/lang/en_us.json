@@ -1,4 +1,6 @@
 {
+  "tempered.config.rendering": "Rendering",
+  "tempered.config.rendering.custom_chests": "Use custom treasure chests",
   "tempered.config.aspects": "Aspects",
   "tempered.config.affixes": "Affixes",
   "tempered.config.equipment": "Equipment",
