@@ -9,6 +9,15 @@ and earn Affixes by using your equipment.
 - **Executioner:** hostile melee kills unlock execution effects.
 - Progress stays with your equipment through supported upgrades and repairs.
 
+## Planned direction
+
+A dedicated **Tempering Block** will let players temper equipment into more
+powerful forms, with a risk of losing it. The block and risky tempering mechanic
+are **not implemented yet**; inputs, costs, rewards and failure rules still need
+to be designed. The existing progression features provide their foundation.
+See [planned design](docs/planned-design.md) for the remaining original ideas
+and how they differ from the implemented features.
+
 ## Installation
 
 Install Tempered and [GuideME](https://www.curseforge.com/minecraft/mc-mods/guideme)
